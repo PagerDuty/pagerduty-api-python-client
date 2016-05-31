@@ -1,0 +1,4 @@
+pypd.egg-info/
+*.pyc
+.DS_Store
+api.key

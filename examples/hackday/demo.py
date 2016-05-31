@@ -112,6 +112,13 @@ service_data = {
         'type': 'constant',
         'urgency': 'high',
     },
+    'integrations': [
+        {
+            'type': 'generic_email_inbound_integration',
+            'name': 'Email Integration',
+            'integration_email': 'drumpf@pdt-jdc.pagerduty.com',
+        }
+    ],
 }
 
 team_data = {

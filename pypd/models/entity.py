@@ -37,7 +37,45 @@ class Entity(ClientMixin):
         ClientMixin.__init__(self, api_key)
 
     @classmethod
-    def fetch(cls, id, api_key=None, **kwargs):
+    def _fetch_all(cls, api_key, endpoint, limit=25, **kwargs):
+        parse_key = cls.sanitize_ep(cls.endpoint)
+        limit = max(1, min(100, limit))
+        inst = cls(api_key=api_key)
+        output = []
+        qp = kwargs.copy()
+
+        while True:
+            data = inst.request('GET', endpoint=endpoint, query_params=qp)
+            output += cls._parse(data, key=parse_key)
+            more = data.get('more')
+            limit = data.get('limit')
+            offset = data.get('offset')
+            total = data.get('total')
+
+            if data.get('more') is None:
+                if total is None or offset is None:
+                    break
+                more = (limit + offset) < total
+
+            if not more:
+                break
+
+            qp['limit'] = limit
+            qp['offset'] = offset + limit
+
+        return output
+
+    @classmethod
+    def _fetch_page(cls, api_key, endpoint, limit=25, **kwargs):
+        parse_key = cls.sanitize_ep(cls.endpoint)
+        limit = max(1, min(100, limit))
+        inst = cls(api_key=api_key)
+        return cls._parse(inst.request('GET', endpoint=endpoint,
+                                       query_params=kwargs),
+                          key=parse_key)
+
+    @classmethod
+    def fetch(cls, id, api_key=None, fetch_all=True, **kwargs):
         inst = cls(api_key=api_key)
         parse_key = cls.sanitize_ep(cls.endpoint)
         endpoint = '/'.join((cls.endpoint, id))
@@ -63,9 +101,27 @@ class Entity(ClientMixin):
         return all(bools)
 
     @classmethod
-    def find(cls, api_key=None, **kwargs):
-        inst = cls(api_key=api_key)
-        parse_key = cls.sanitize_ep(cls.endpoint, plural=True)
+    def translate_query_params(cls, query, kwargs):
+        params = {}
+        output = kwargs.copy()
+
+        for param in cls.TRANSLATE_QUERY_PARAM:
+            params[param] = kwargs.pop(param, None)
+
+        if query is None:
+            iparams = ifilter(None, params.values())
+            try:
+                query = iparams.next()
+            except StopIteration:
+                pass
+        if query is not None:
+            output['query'] = query
+
+        return output
+
+    @classmethod
+    def find(cls, api_key=None, fetch_all=True, endpoint=None, maximum=None,
+             **kwargs):
         exclude = kwargs.pop('exclude', None)
         query = kwargs.pop('query', None)
 
@@ -73,26 +129,19 @@ class Entity(ClientMixin):
             exclude = [exclude, ]
 
         if cls.TRANSLATE_QUERY_PARAM:
-            params = {}
-            for param in cls.TRANSLATE_QUERY_PARAM:
-                params[param] = kwargs.pop(param, None)
+            query_params = cls.translate_query_params(query, kwargs)
+        else:
+            query_params = kwargs
 
-            if query is None:
-                iparams = ifilter(None, params.values())
-                try:
-                    query = iparams.next()
-                except StopIteration:
-                    pass
-            if query is not None:
-                kwargs['query'] = query
+        if endpoint is None:
+            endpoint = cls.endpoint
 
-        data = cls._parse(inst.request('GET',
-                                       endpoint=cls.endpoint,
-                                       query_params=kwargs),
-                          key=parse_key)
-        collection = [cls(api_key=api_key, _data=d) for d in data
-                      if cls._find_exclude_filter(exclude, d)]
-        return collection
+        if fetch_all:
+            return cls._fetch_all(api_key=api_key, endpoint=endpoint,
+                                  maximum=maximum,
+                                  **query_params)
+        return cls._fetch_page(api_key=api_key, endpoint=endpoint,
+                               **query_params)
 
     @classmethod
     def find_one(cls, *args, **kwargs):

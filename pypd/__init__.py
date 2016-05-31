@@ -1,6 +1,7 @@
 from .version import __version__
 from .models.escalation_policy import EscalationPolicy
 from .models.incident import Incident
+from .models.log_entry import LogEntry
 from .models.user import User
 from .models.schedule import Schedule
 from .models.service import Service
