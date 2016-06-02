@@ -75,12 +75,13 @@ class Entity(ClientMixin):
                           key=parse_key)
 
     @classmethod
-    def fetch(cls, id, api_key=None, fetch_all=True, **kwargs):
+    def fetch(cls, id, api_key=None, fetch_all=True, add_headers=None, **kwargs):
         inst = cls(api_key=api_key)
         parse_key = cls.sanitize_ep(cls.endpoint)
         endpoint = '/'.join((cls.endpoint, id))
         data = cls._parse(inst.request('GET',
                                        endpoint=endpoint,
+                                       add_headers=add_headers,
                                        query_params=kwargs),
                           key=parse_key)
         inst._set(data)
