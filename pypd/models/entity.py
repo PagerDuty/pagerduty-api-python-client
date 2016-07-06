@@ -1,4 +1,5 @@
 
+import logging
 import ujson as json
 from itertools import ifilter
 
@@ -16,6 +17,17 @@ class Entity(ClientMixin):
     STR_OUTPUT_FIELDS = ('id',)
     TRANSLATE_QUERY_PARAM = None
 
+    def __init__(self, api_key=None, _data=None):
+        if _data is not None:
+            self._set(_data)
+
+        # sanitize the endpoint name incase people make mistakes
+        if self.endpoint.endswith('/'):
+            logging.warn('Endpoints should not end with a trailing slash, %s',
+                         self.__class__)
+            self.endpoint = self.endpoint[:-1]
+        ClientMixin.__init__(self, api_key)
+
     @staticmethod
     def sanitize_ep(endpoint, plural=False):
         if plural:
@@ -31,14 +43,9 @@ class Entity(ClientMixin):
 
         return endpoint
 
-    def __init__(self, api_key=None, _data=None):
-        if _data is not None:
-            self._set(_data)
-        ClientMixin.__init__(self, api_key)
-
     @classmethod
     def _fetch_all(cls, api_key, endpoint, limit=25, **kwargs):
-        parse_key = cls.sanitize_ep(cls.endpoint)
+        parse_key = cls.sanitize_ep(cls.endpoint, plural=True)
         limit = max(1, min(100, limit))
         inst = cls(api_key=api_key)
         output = []

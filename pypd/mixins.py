@@ -30,12 +30,6 @@ class ClientMixin(object):
             base_url = base_url
         self.base_url = base_url
 
-        # sanitize the endpoint name incase people make mistakes
-        if self.endpoint.endswith('/'):
-            logging.warn('Endpoints should not end with a trailing slash, %s',
-                         self.__class__)
-            self.endpoint = self.endpoint[:-1]
-
     def _handle_response(self, response):
         if response.status_code == 404:
             response.raise_for_status()
