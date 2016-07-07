@@ -13,7 +13,7 @@ options = {
     'author': 'JD Cumpson',
     'author_email': 'jdc@pagerduty.com',
     'maintainer_email': 'jdc@pagerduty.com',
-    'license': 'LGPL',
+    'license': 'MIT',
     'url': 'https://github.com/PagerDuty/pypd',
     'download_url': 'https://github.com/PagerDuty/pypd/archive/master.tar.gz',
     'classifiers': [

@@ -1,4 +1,5 @@
-
+# Copyright (c) PagerDuty.
+# See LICENSE for details.
 from __future__ import print_function
 
 import pypd

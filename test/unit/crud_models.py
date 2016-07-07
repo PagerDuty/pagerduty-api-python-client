@@ -1,3 +1,5 @@
+# Copyright (c) PagerDuty.
+# See LICENSE for details.
 import os
 import os.path
 import unittest

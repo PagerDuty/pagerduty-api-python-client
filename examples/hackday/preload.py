@@ -1,4 +1,5 @@
-
+# Copyright (c) PagerDuty.
+# See LICENSE for details.
 from os.path import dirname, join
 
 import pypd

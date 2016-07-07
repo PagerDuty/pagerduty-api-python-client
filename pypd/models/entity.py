@@ -1,4 +1,5 @@
-
+# Copyright (c) PagerDuty.
+# See LICENSE for details.
 import logging
 import ujson as json
 from itertools import ifilter

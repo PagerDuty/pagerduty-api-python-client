@@ -1,4 +1,5 @@
-
+# Copyright (c) PagerDuty.
+# See LICENSE for details.
 import logging
 
 from pypd.models.entity import Entity

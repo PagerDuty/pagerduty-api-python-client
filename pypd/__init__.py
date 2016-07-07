@@ -1,3 +1,5 @@
+# Copyright (c) PagerDuty.
+# See LICENSE for details.
 from .version import __version__
 from .models.escalation_policy import EscalationPolicy
 from .models.incident import Incident

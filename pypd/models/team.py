@@ -1,4 +1,5 @@
-
+# Copyright (c) PagerDuty.
+# See LICENSE for details.
 from pypd.models.entity import Entity
 from pypd.models.user import User
 
