@@ -45,21 +45,23 @@ class Entity(ClientMixin):
 
     @classmethod
     def _fetch_all(cls, api_key, endpoint, limit=25, **kwargs):
-        parse_key = cls.sanitize_ep(cls.endpoint, plural=True)
-        limit = max(1, min(100, limit))
-        inst = cls(api_key=api_key)
         output = []
         qp = kwargs.copy()
+        limit = max(1, min(100, limit))
+        more, offset, total = None, 0, None
 
         while True:
-            data = inst.request('GET', endpoint=endpoint, query_params=qp)
-            output += cls._parse(data, key=parse_key)
-            more = data.get('more')
-            limit = data.get('limit')
-            offset = data.get('offset')
-            total = data.get('total')
+            entities, options = cls._fetch_page(
+                api_key=api_key, endpoint=endpoint, offset=offset,
+                query_params=qp,
+            )
+            output += entities
+            more = options.get('more')
+            limit = options.get('limit')
+            offset = options.get('offset')
+            total = options.get('total')
 
-            if data.get('more') is None:
+            if more is None:
                 if total is None or offset is None:
                     break
                 more = (limit + offset) < total
@@ -73,13 +75,20 @@ class Entity(ClientMixin):
         return output
 
     @classmethod
-    def _fetch_page(cls, api_key, endpoint, limit=25, **kwargs):
-        parse_key = cls.sanitize_ep(cls.endpoint)
+    def _fetch_page(cls, api_key, endpoint, page_index=0, offset=None,
+                    limit=25, **kwargs):
+        if offset is not None:
+            page_index = limit * offset
+
         limit = max(1, min(100, limit))
         inst = cls(api_key=api_key)
-        return cls._parse(inst.request('GET', endpoint=endpoint,
-                                       query_params=kwargs),
-                          key=parse_key)
+        kwargs['offset'] = int(page_index * limit)
+        response = inst.request('GET', endpoint=endpoint, query_params=kwargs)
+        parse_key = cls.sanitize_ep(cls.endpoint, plural=True)
+        datas = cls._parse(response, key=parse_key)
+        response.pop(parse_key, None)
+        entities = map(lambda d: cls(api_key=api_key, _data=d), datas)
+        return entities, response
 
     @classmethod
     def fetch(cls, id, api_key=None, fetch_all=True, add_headers=None, **kwargs):
@@ -145,11 +154,15 @@ class Entity(ClientMixin):
             endpoint = cls.endpoint
 
         if fetch_all:
-            return cls._fetch_all(api_key=api_key, endpoint=endpoint,
-                                  maximum=maximum,
-                                  **query_params)
-        return cls._fetch_page(api_key=api_key, endpoint=endpoint,
-                               **query_params)
+            result = cls._fetch_all(api_key=api_key, endpoint=endpoint,
+                                    maximum=maximum,
+                                    **query_params)
+        else:
+            result = cls._fetch_page(api_key=api_key, endpoint=endpoint,
+                                     **query_params)
+        collection = [r for r in result
+                      if cls._find_exclude_filter(exclude, r)]
+        return collection
 
     @classmethod
     def find_one(cls, *args, **kwargs):
@@ -162,7 +175,7 @@ class Entity(ClientMixin):
         entity_endpoint = cls.sanitize_ep(cls.endpoint)
         body = {}
         body[entity_endpoint] = data
-        inst._set(cls._parse(inst.request('POST', 
+        inst._set(cls._parse(inst.request('POST',
                                           endpoint=cls.endpoint,
                                           data=body,
                                           query_params=kwargs,
@@ -214,6 +227,12 @@ class Entity(ClientMixin):
         except:
             raise AttributeError("'%s' has no attribute '%s'" %
                                  (type(self), attr,))
+
+    def get(self, attr, default=None):
+        try:
+            return self[attr]
+        except:
+            return default
 
     def __json__(self):
         return json.dumps(self._data)
