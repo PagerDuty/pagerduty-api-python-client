@@ -8,7 +8,7 @@ A client in Python for PagerDuty's v2 API.
 All the code in this distribution is Copyright (c) 2016 PagerDuty.
 
 
-txpypd is availabe under the MIT License. The [LICENSE](LICENSE) file has 
+pypd is availabe under the MIT License. The [LICENSE](LICENSE) file has 
 the complete details.
 
 
