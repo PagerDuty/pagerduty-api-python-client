@@ -45,16 +45,17 @@ class Entity(ClientMixin):
         return endpoint
 
     @classmethod
-    def _fetch_all(cls, api_key, endpoint, limit=25, **kwargs):
+    def _fetch_all(cls, api_key, endpoint=None, offset=0, limit=25, **kwargs):
         output = []
         qp = kwargs.copy()
         limit = max(1, min(100, limit))
-        more, offset, total = None, 0, None
+        qp['limit'] = limit
+        qp['offset'] = offset
+        more, total = None, None
 
         while True:
             entities, options = cls._fetch_page(
-                api_key=api_key, endpoint=endpoint, offset=offset,
-                query_params=qp,
+                api_key=api_key, endpoint=endpoint, **qp
             )
             output += entities
             more = options.get('more')
@@ -76,7 +77,7 @@ class Entity(ClientMixin):
         return output
 
     @classmethod
-    def _fetch_page(cls, api_key, endpoint, page_index=0, offset=None,
+    def _fetch_page(cls, api_key, endpoint=None, page_index=0, offset=None,
                     limit=25, **kwargs):
         if offset is not None:
             page_index = limit * offset
@@ -84,8 +85,16 @@ class Entity(ClientMixin):
         limit = max(1, min(100, limit))
         inst = cls(api_key=api_key)
         kwargs['offset'] = int(page_index * limit)
-        response = inst.request('GET', endpoint=endpoint, query_params=kwargs)
-        parse_key = cls.sanitize_ep(cls.endpoint, plural=True)
+        kwargs['limit'] = limit
+        ep = parse_key = cls.sanitize_ep(cls.endpoint, plural=True)
+
+        # if an override to the endpoint is provided use that instead
+        # not sure if this is every useful (no reason for endpoint argument)
+        if endpoint is not None:
+            ep = endpoint
+
+        print '--  %s %s' % ('GET', ep,)
+        response = inst.request('GET', endpoint=ep, query_params=kwargs)
         datas = cls._parse(response, key=parse_key)
         response.pop(parse_key, None)
         entities = map(lambda d: cls(api_key=api_key, _data=d), datas)
@@ -93,6 +102,11 @@ class Entity(ClientMixin):
 
     @classmethod
     def fetch(cls, id, api_key=None, fetch_all=True, add_headers=None, **kwargs):
+        """
+        Fetch a single entity from the API endpoint.
+
+        Used when you know the exact ID that must be queried.
+        """
         inst = cls(api_key=api_key)
         parse_key = cls.sanitize_ep(cls.endpoint)
         endpoint = '/'.join((cls.endpoint, id))
@@ -105,21 +119,80 @@ class Entity(ClientMixin):
         return inst
 
     @classmethod
-    def _find_exclude_filter(cls, exclude, item):
-        if exclude is None:
-            return True
+    def _find_exclude_filter(cls, excludes, item):
+        """
+        For each item returned by a `find()` maybe filter it out.
 
-        bools = []
-        for ef in cls.EXCLUDE_FILTERS:
-            if callable(ef):
-                bools.append(ef(item))
-            else:
-                bools.append(item.get(ef) not in exclude)
+        Called for each item returned to find a function or string to exclude
+        `item` from a filtered list. This method should return truthy values
+        where `True`-like values will allow `item` to be included into the
+        set, and `False` values will not allow them into the set (filter
+        predicate).
 
-        return all(bools)
+        This is a dynamic filtering method such that users of the library
+        will be able to do something like:
+
+        Class.find(exclude=('email@address.com', 1,))
+
+        Where the coreesponding EXCLUDE_FILTERS = ('email', 'id',). Similar to
+        matching any value on any indexed field, where EXCLUDE_FILTERS are the
+        indexes.
+
+        XXX: Even explaining this was difficult. Probably an easier more
+        pragmatic way to do this.
+        """
+        # if exclude is left blank (not a list) then the predicate will just
+        # be true
+        if excludes is None:
+            return False
+
+        # oh my...
+        def test_each_exclude(exclude_value):
+            # excluded_value is one of excludes = (...,)
+            def exclude_equals_value_test(exclude_filter):
+                # exclude_filter is one of EXCLUDE_FILTERS = (...,)
+                if callable(exclude_filter):
+                    return exclude_filter(cls, item, exclude_value,)
+                return item.get(exclude_filter) == exclude_value
+            return any(map(exclude_equals_value_test, cls.EXCLUDE_FILTERS))
+        return any(map(test_each_exclude, excludes))
 
     @classmethod
-    def translate_query_params(cls, query, kwargs):
+    def translate_query_params(cls, query=None, **kwargs):
+        """
+        Translates an arbirtary keyword argument to the expected query.
+
+        In the v2 API, many endpoints expect a particular query argument to be
+        in the form of `query=xxx` where `xxx` would be the name of perhaps
+        the name, ID or otherwise. This function ought to take a more aptly
+        named parameter specified in `TRANSLATE_QUERY_PARAM`, and substitute it
+        into the `query` keyword argument. The purpose is so that some models
+        (optionally) have nicer named keyword arguments than `query` for easier
+        to read python.
+
+        If a query argument is given then the output should be that value. If a
+        substitute value is given as a keyword specified in
+        `TRANSLATE_QUERY_PARAM`(and query is not) then the `query` argument
+        will be that keyword argument.
+
+        Eg. No query param
+
+            query = None
+            TRANSLATE_QUERY_PARAM = ('name',)
+            kwargs = {'name': 'PagerDuty'}
+            ...
+            output = {'query': 'PagerDuty'}
+
+        or, query param explicitly
+
+            query = 'XXXXPlopperDuty'
+            TRANSLATE_QUERY_PARAM = ('name',)
+            kwargs = {'name': 'PagerDuty'}
+            ...
+            output = {'query': 'XXXXPlopperDuty'}
+
+        XXX: Clean this up. It's *too* flexible.
+        """
         params = {}
         output = kwargs.copy()
 
@@ -140,6 +213,22 @@ class Entity(ClientMixin):
     @classmethod
     def find(cls, api_key=None, fetch_all=True, endpoint=None, maximum=None,
              **kwargs):
+        """
+        Find some entities from the API endpoint.
+
+        If no api_key is provided, the global api key will be used.
+        If fetch_all is True, page through all the data and find every record
+        that exists.
+        If add_headers is provided (as a dict) use it to add headers to the 
+        HTTP request, eg.
+
+            {'host': 'some.hidden.host'}
+
+        Capitalizing header keys does not matter.
+
+        Remaining keyword arguments will be passed as `query_params` to the
+        instant method `request` (ClientMixin).
+        """
         exclude = kwargs.pop('exclude', None)
         query = kwargs.pop('query', None)
 
@@ -147,7 +236,7 @@ class Entity(ClientMixin):
             exclude = [exclude, ]
 
         if cls.TRANSLATE_QUERY_PARAM:
-            query_params = cls.translate_query_params(query, kwargs)
+            query_params = cls.translate_query_params(query, **kwargs)
         else:
             query_params = kwargs
 
@@ -162,7 +251,7 @@ class Entity(ClientMixin):
             result = cls._fetch_page(api_key=api_key, endpoint=endpoint,
                                      **query_params)
         collection = [r for r in result
-                      if cls._find_exclude_filter(exclude, r)]
+                      if not cls._find_exclude_filter(exclude, r)]
         return collection
 
     @classmethod
@@ -217,6 +306,11 @@ class Entity(ClientMixin):
 
     @property
     def json(self):
+        """
+        Returns a dict that can be serialized to a JSON-string.
+
+        Does NOT return an encoded string.
+        """
         return self._data
 
     def remove(self):
