@@ -100,6 +100,7 @@ class EntityTestCase(unittest.TestCase):
         more = False
         total = None
 
+        # define endpoint entity data
         entities_data = {
             'limit': limit,
             'offset': offset,
@@ -112,6 +113,7 @@ class EntityTestCase(unittest.TestCase):
             ]
         }
 
+        # register request mock url with resultant data
         m.register_uri(method, self.url, json=entities_data)
         entities, response = self.cls._fetch_page(
             api_key=self.api_key,
@@ -126,6 +128,7 @@ class EntityTestCase(unittest.TestCase):
 
     @requests_mock.Mocker()
     def test_fetch_all(self, m):
+        # setup mocked request uris
         for data in self.responses_data:
             args = 'limit=%s&offset=%s' % (
                 data['limit'], data['offset'],
@@ -133,11 +136,14 @@ class EntityTestCase(unittest.TestCase):
             url = self.url + '?%s' % args
             m.register_uri('GET', url, json=data, complete_qs=True)
 
+        # fetch all entities from endpoint
         entities = self.cls._fetch_all(
             api_key=self.api_key,
             limit=self.limit,
         )
 
+        # ensure result is all instances of self.cls and that data on the
+        # instances is correct
         for n, entity in enumerate(entities):
             self.assertTrue(isinstance(entity, self.cls))
             self.assertEqual(
@@ -145,6 +151,7 @@ class EntityTestCase(unittest.TestCase):
                 self.responses_data[n]['entities'][0]['id']
             )
 
+        # ensure that the result is actually all of the results
         self.assertEqual(
             len(entities),
             len(self.responses_data[0]['entities']) +
@@ -153,6 +160,7 @@ class EntityTestCase(unittest.TestCase):
 
     @requests_mock.Mocker()
     def test_find(self, m):
+        # setup mocked request uris
         for data in self.responses_data:
             args = 'limit=%s&offset=%s' % (
                 data['limit'], data['offset'],
@@ -238,6 +246,7 @@ class EntityTestCase(unittest.TestCase):
 
     @requests_mock.Mocker()
     def test_parse(self, m):
+        # setup mocked request uris
         for data in self.responses_data:
             args = 'limit=%s&offset=%s' % (
                 1, data['offset'],
@@ -245,12 +254,17 @@ class EntityTestCase(unittest.TestCase):
             url = self.url + '?%s' % args
             m.register_uri('GET', url, json=data, complete_qs=True)
 
+        # define a class to test parsing using parse as a string
         class TestParseString(Entity):
             endpoint = 'entities'
             parse = 'entities'
 
+        # fetch the entities
         entities = TestParseString.find(api_key=self.api_key, maximum=1,)
+        # ensure that there is only 1 result (maximum)
         self.assertEqual(len(entities), 1)
+
+        # for each entity ensure instance of TestParseString, and data is valid
         for n, entity in enumerate(entities):
             self.assertEqual(
                 entities[n]['id'],
@@ -258,6 +272,7 @@ class EntityTestCase(unittest.TestCase):
             )
             self.assertTrue(isinstance(entities[n], TestParseString))
 
+        # class to test parse implemented as a classmethod
         class TestParseFunction(Entity):
             endpoint = 'entities'
 
@@ -265,9 +280,14 @@ class EntityTestCase(unittest.TestCase):
             def parse(cls, data):
                 return data['entities']
 
+        # fetch entities
         entities = TestParseFunction.find(api_key=self.api_key, limit=1,
                                           maximum=1)
+        # ensure only one was returned
         self.assertEqual(len(entities), 1)
+
+        # for each entity ensure instance of TestParseFunction and that
+        # returned data is valid
         for n, entity in enumerate(entities):
             self.assertEqual(
                 entities[n]['id'],

@@ -1,5 +1,11 @@
 # Copyright (c) PagerDuty.
 # See LICENSE for details.
+"""
+Entity module provides a base class Entity for defining a PagerDuty entity.
+
+Entities should be used as the base for all things that ought to be queryable
+via PagerDuty v2 API.
+"""
 import logging
 import ujson as json
 from itertools import ifilter
@@ -7,16 +13,88 @@ from itertools import ifilter
 from pypd.mixins import ClientMixin
 
 
+class NotInitialized(Exception):
+    """Raise when an entity is not initialized but accessed as if it were."""
+
+
 class Entity(ClientMixin):
+    """
+    Base class for implementing a PagerDuty-something.
+
+    Entities can access their underlying entity data by using dict-like
+    accessor methods, ie. `get('property_name', default_value)` and using
+    entity['property'] accessors.
+
+    Entities inherit from a ClientMixin which handles doing HTTP requests. They
+    also have some special properties to them:
+
+    Entity classes have classmethods for which to initialize queries that ought
+    to return a class instance, or a list of class instances they are:
+        find:
+            finds some instances of this entity, returns a list
+        find_one:
+            finds one instance of this entity, returns instance
+        fetch:
+            finds one instance of this entity, returns instance
+        create:
+            creates an instance of this entity (HTTP POST), returns instance
+        delete:
+            deletes an instance of this entity (HTTP DELETE), returns None
+
+    Entities have instance methods that help interact with an entity on the api
+    they are:
+        remove:
+            deletes this entity instance, returns None
+        get:
+            access any property on the entity, like dict-accessor get
+
+    Entities have properties that are also interesting (accessed with dot
+    notation):
+        id:
+            the entities ID value (str)
+        json:
+            the json representation of the entity (dict)
+        _data:
+            (do not use directly) contains raw entity data, accessible with
+            `get(property, default_value)` OR with entity['property'] syntax
+
+    Entity classes use few special class instances:
+        TRANSLATE_QUERY_PARAM:
+            A list of strings that ought to be translated to 'query' for the
+            query string '?query=stuff', eg.
+
+                TRANSLATE_QUERY_PARAM = ('name',)
+                query_with_kwargs(name='joeblow')
+                # output = 'uri?query=joeblow'
+        MAX_LIMIT_VALUE:
+            The normal maximum number of entities returned per page from the
+            PagerDuty API
+        EXCLUDE_FILTERS:
+            A list of strings and methods that will be used to filter out
+            entities with the matching criteria. Where strings will look
+            to match the keyword argument `excludes='joeblow'` to a value found
+            on a key matching any EXLCUDE_FILTERS value OR will apply a method
+            with signatures `def exclude_method(cls, item, value)`. Eg.
+
+            class CustomEntity(Entity):
+                EXCLUDE_FILTERS = ['name', ...]
+
+                # is the same as
+
+                EXCLUDE_FILTERS =
+                    [lambda cls, item, ev: item.get('name').count(ev), ...]
+    """
+
     id = None
     _data = None
     parse = None
     endpoint = None
     # flag so subsequent 'save' operations fail, and require a 'clone'
     _is_deleted = False
-    EXCLUDE_FILTERS = ('name',)
-    STR_OUTPUT_FIELDS = ('id',)
-    TRANSLATE_QUERY_PARAM = None
+    EXCLUDE_FILTERS = ('name',)  # exclude will filter on these properties
+    STR_OUTPUT_FIELDS = ('id',)  # fields to output in __str__
+    TRANSLATE_QUERY_PARAM = None  # translates uri?query=stuff
+    MAX_LIMIT_VALUE = 100
 
     def __init__(self, api_key=None, _data=None):
         """Initialize Entity model."""
@@ -32,13 +110,22 @@ class Entity(ClientMixin):
 
     @staticmethod
     def sanitize_ep(endpoint, plural=False):
-        """Sanitize an endpoint to a singular or plural form."""
+        """
+        Sanitize an endpoint to a singular or plural form.
+
+        Used mostly for convenience in the `_parse` method to grab the raw
+        data from queried datasets.
+
+        XXX: this is el cheapo (no bastante bien)
+        """
+        # if we need a plural endpoint (acessing lists)
         if plural:
             if endpoint.endswith('y'):
                 endpoint = endpoint[:-1] + 'ies'
             elif not endpoint.endswith('s'):
                 endpoint += 's'
         else:
+            # otherwise make sure it's singular form
             if endpoint.endswith('ies'):
                 endpoint = endpoint[:-3] + 'y'
             elif endpoint.endswith('s'):
@@ -105,25 +192,38 @@ class Entity(ClientMixin):
         Returns a tuple containing a list of `cls` instances and response
         options.
         """
+        # if offset is provided have it overwrite the page_index provided
         if offset is not None:
             page_index = limit * offset
 
-        limit = max(1, min(100, limit))
+        # limit can be maximum MAX_LIMIT_VALUE for most PD queries
+        limit = max(1, min(cls.MAX_LIMIT_VALUE, limit))
+
+        # make an tmp instance to do query work
         inst = cls(api_key=api_key)
+
         kwargs['offset'] = int(page_index * limit)
         maximum = kwargs.pop('maximum', None)
+
+        # if maximum is valid, make the limit <= maximum
         kwargs['limit'] = min(limit, maximum) if maximum is not None else limit
         ep = parse_key = cls.sanitize_ep(cls.endpoint, plural=True)
 
         # if an override to the endpoint is provided use that instead
-        # not sure if this is every useful (no reason for endpoint argument)
+        # this is useful for nested value searches ie. for
+        # `incident_log_entries` but instead of /log_entries querying with
+        # context of /incident/INCIDENTID/log_entries.
+        # XXX: could be cleaner
         if endpoint is not None:
             ep = endpoint
 
         response = inst.request('GET', endpoint=ep, query_params=kwargs)
+        # XXX: this is a little gross right now. Seems like the best way
+        # to do the parsing out of something and then return everything else
         datas = cls._parse(response, key=parse_key)
         response.pop(parse_key, None)
         entities = map(lambda d: cls(api_key=api_key, _data=d), datas)
+        # return a tuple
         return entities, response
 
     @classmethod
@@ -187,7 +287,7 @@ class Entity(ClientMixin):
     @classmethod
     def translate_query_params(cls, query=None, **kwargs):
         """
-        Translates an arbirtary keyword argument to the expected query.
+        Translate an arbirtary keyword argument to the expected query.
 
         In the v2 API, many endpoints expect a particular query argument to be
         in the form of `query=xxx` where `xxx` would be the name of perhaps
@@ -223,15 +323,21 @@ class Entity(ClientMixin):
         params = {}
         output = kwargs.copy()
 
+        # try to remove any of the query parameters out of the kwargs
+        # because they should not show up in the uri string
         for param in cls.TRANSLATE_QUERY_PARAM:
             params[param] = kwargs.pop(param, None)
 
+        # if query is not provided, use the first parameter we removed from
+        # the kwargs
         if query is None:
             iparams = ifilter(None, params.values())
             try:
                 query = iparams.next()
             except StopIteration:
                 pass
+
+        # if query is provided, just use it
         if query is not None:
             output['query'] = query
 
@@ -259,6 +365,7 @@ class Entity(ClientMixin):
         exclude = kwargs.pop('exclude', None)
         query = kwargs.pop('query', None)
 
+        # if exclude param was passed a a string, list-ify it
         if isinstance(exclude, basestring):
             exclude = [exclude, ]
 
@@ -267,6 +374,7 @@ class Entity(ClientMixin):
         else:
             query_params = kwargs
 
+        # unless otherwise specified use the class variable for the endpoint
         if endpoint is None:
             endpoint = cls.endpoint
 
@@ -278,17 +386,35 @@ class Entity(ClientMixin):
             result = cls._fetch_page(api_key=api_key, endpoint=endpoint,
                                      maximum=maximum,
                                      **query_params)
+
+        # for each result run it through an exlcusion filter
         collection = [r for r in result
                       if not cls._find_exclude_filter(exclude, r)]
         return collection
 
     @classmethod
     def find_one(cls, *args, **kwargs):
+        """Like `find()` except ensure that only one result is returned."""
+        # ensure that maximum is supplied so that a big query is not happening
+        # behind the scenes
+        if 'maximum' not in kwargs:
+            kwargs['maximum'] = 1
+
+        # call find and extract the first iterated value from the result
         iterable = iter(cls.find(*args, **kwargs))
         return iterable.next()
 
     @classmethod
     def create(cls, data=None, api_key=None, add_headers=None, **kwargs):
+        """
+        Create an instance of the Entity model by calling to the API endpoint.
+
+        This ensures that server knows about the creation before returning
+        the class instance.
+
+        NOTE: The server must return a response with the schema containing
+        the entire entity value. A True or False response is no bueno.
+        """
         inst = cls(api_key=api_key)
         entity_endpoint = cls.sanitize_ep(cls.endpoint)
         body = {}
@@ -304,6 +430,7 @@ class Entity(ClientMixin):
 
     @classmethod
     def delete(cls, id, api_key=None, **kwargs):
+        """Delete an entity from the server by ID."""
         inst = cls(api_key=api_key)
         endpoint = '/'.join((cls.endpoint, id))
         inst.request('DELETE', endpoint=endpoint, query_params=kwargs)
@@ -312,6 +439,12 @@ class Entity(ClientMixin):
 
     @classmethod
     def _parse(cls, data, key=None):
+        """
+        Parse a set of data to extract entity-only data.
+
+        Use classmethod `parse` if available, otherwise use the `endpoint`
+        class variable to extract data from a data blob.
+        """
         parse = cls.parse if cls.parse is not None else cls.endpoint
 
         if callable(parse):
@@ -328,23 +461,30 @@ class Entity(ClientMixin):
 
     @property
     def id(self):
+        """
+        Return the entity's ID from `self._data`.
+
+        If not initialized raise a `NotInitialized` exception.
+        """
         if self._data is None:
-            return None
+            raise NotInitialized
         return self._data['id']
 
     @property
     def json(self):
         """
-        Returns a dict that can be serialized to a JSON-string.
+        Return a dict that can be serialized to a JSON-string.
 
         Does NOT return an encoded string.
         """
         return self._data
 
     def remove(self):
+        """Delete this instance from server record."""
         return self.__class__.delete(self.id)
 
     def __getitem__(self, attr):
+        """Attribute accessor method in dict-like fashion."""
         try:
             return self._data[attr]
         except:
@@ -352,15 +492,18 @@ class Entity(ClientMixin):
                                  (type(self), attr,))
 
     def get(self, attr, default=None):
+        """Attribute accessor method in dict-like fashion."""
         try:
             return self[attr]
         except:
             return default
 
     def __json__(self):
+        """Return a valid JSON string dump of the entity data."""
         return json.dumps(self._data)
 
     def __str__(self):
+        """Return a more meaningful class string."""
         id_ = hex(id(self))
         clsname = self.__class__.__name__
 
@@ -382,4 +525,5 @@ class Entity(ClientMixin):
         return output
 
     def __repr__(self):
+        """Return a more meaningful programmer representation string."""
         return self.__str__()
