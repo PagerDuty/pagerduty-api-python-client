@@ -194,7 +194,7 @@ class Entity(ClientMixin):
         """
         # if offset is provided have it overwrite the page_index provided
         if offset is not None:
-            page_index = limit * offset
+            page_index = int(offset / limit)
 
         # limit can be maximum MAX_LIMIT_VALUE for most PD queries
         limit = max(1, min(cls.MAX_LIMIT_VALUE, limit))
