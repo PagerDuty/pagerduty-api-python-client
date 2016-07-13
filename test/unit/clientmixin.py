@@ -1,12 +1,8 @@
 # Copyright (c) PagerDuty.
 # See LICENSE for details.
-import os
-import os.path
 import unittest
-import ujson as json
 
 import requests_mock
-from mock import Mock
 from requests import HTTPError
 
 from pypd.mixins import ClientMixin
