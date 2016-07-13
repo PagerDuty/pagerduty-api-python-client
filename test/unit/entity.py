@@ -240,23 +240,40 @@ class EntityTestCase(unittest.TestCase):
     def test_parse(self, m):
         for data in self.responses_data:
             args = 'limit=%s&offset=%s' % (
-                data['limit'], data['offset'],
+                1, data['offset'],
             )
             url = self.url + '?%s' % args
             m.register_uri('GET', url, json=data, complete_qs=True)
 
-        class TestParse(Entity):
+        class TestParseString(Entity):
             endpoint = 'entities'
             parse = 'entities'
 
-        entities = TestParse.find(api_key=self.api_key, limit=1,)
-        self.assertEqual(len(entities), 2)
+        entities = TestParseString.find(api_key=self.api_key, maximum=1,)
+        self.assertEqual(len(entities), 1)
         for n, entity in enumerate(entities):
             self.assertEqual(
                 entities[n]['id'],
                 self.responses_data[n]['entities'][0]['id']
             )
-            self.assertTrue(isinstance(entities[n], TestParse))
+            self.assertTrue(isinstance(entities[n], TestParseString))
+
+        class TestParseFunction(Entity):
+            endpoint = 'entities'
+
+            @classmethod
+            def parse(cls, data):
+                return data['entities']
+
+        entities = TestParseFunction.find(api_key=self.api_key, limit=1,
+                                          maximum=1)
+        self.assertEqual(len(entities), 1)
+        for n, entity in enumerate(entities):
+            self.assertEqual(
+                entities[n]['id'],
+                self.responses_data[n]['entities'][0]['id']
+            )
+            self.assertTrue(isinstance(entities[n], TestParseFunction))
 
 
 if __name__ == '__main__':

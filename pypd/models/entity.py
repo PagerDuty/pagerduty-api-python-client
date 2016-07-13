@@ -19,6 +19,7 @@ class Entity(ClientMixin):
     TRANSLATE_QUERY_PARAM = None
 
     def __init__(self, api_key=None, _data=None):
+        """Initialize Entity model."""
         if _data is not None:
             self._set(_data)
 
@@ -31,6 +32,7 @@ class Entity(ClientMixin):
 
     @staticmethod
     def sanitize_ep(endpoint, plural=False):
+        """Sanitize an endpoint to a singular or plural form."""
         if plural:
             if endpoint.endswith('y'):
                 endpoint = endpoint[:-1] + 'ies'
@@ -46,10 +48,19 @@ class Entity(ClientMixin):
 
     @classmethod
     def _fetch_all(cls, api_key, endpoint=None, offset=0, limit=25, **kwargs):
+        """
+        Call `self._fetch_page` for as many pages as exist.
+
+        TODO: should be extended to do async page fetches if API allows it via
+        exposing total value.
+
+        Returns a list of `cls` instances.
+        """
         output = []
         qp = kwargs.copy()
         limit = max(1, min(100, limit))
-        qp['limit'] = limit
+        maximum = kwargs.get('maximum')
+        qp['limit'] = min(limit, maximum) if maximum is not None else limit
         qp['offset'] = offset
         more, total = None, None
 
@@ -68,7 +79,7 @@ class Entity(ClientMixin):
                     break
                 more = (limit + offset) < total
 
-            if not more:
+            if not more or (maximum is not None and len(output) >= maximum):
                 break
 
             qp['limit'] = limit
@@ -79,13 +90,29 @@ class Entity(ClientMixin):
     @classmethod
     def _fetch_page(cls, api_key, endpoint=None, page_index=0, offset=None,
                     limit=25, **kwargs):
+        """
+        Fetch a single page of `limit` number of results.
+
+        Optionally provide `page_index` an integer (0-based) index for the
+        page to return. Calculated based on `limit` and `offset`.
+
+        Optionally provide `offset` which will override `page_index` if both
+        are passed, will be used to calculate the integer offset of items.
+
+        Optionally provide `limit` integer describing how many items pages
+        ought to have.
+
+        Returns a tuple containing a list of `cls` instances and response
+        options.
+        """
         if offset is not None:
             page_index = limit * offset
 
         limit = max(1, min(100, limit))
         inst = cls(api_key=api_key)
         kwargs['offset'] = int(page_index * limit)
-        kwargs['limit'] = limit
+        maximum = kwargs.pop('maximum', None)
+        kwargs['limit'] = min(limit, maximum) if maximum is not None else limit
         ep = parse_key = cls.sanitize_ep(cls.endpoint, plural=True)
 
         # if an override to the endpoint is provided use that instead
@@ -93,7 +120,6 @@ class Entity(ClientMixin):
         if endpoint is not None:
             ep = endpoint
 
-        print '--  %s %s' % ('GET', ep,)
         response = inst.request('GET', endpoint=ep, query_params=kwargs)
         datas = cls._parse(response, key=parse_key)
         response.pop(parse_key, None)
@@ -101,7 +127,8 @@ class Entity(ClientMixin):
         return entities, response
 
     @classmethod
-    def fetch(cls, id, api_key=None, fetch_all=True, add_headers=None, **kwargs):
+    def fetch(cls, id, api_key=None, fetch_all=True, add_headers=None,
+              **kwargs):
         """
         Fetch a single entity from the API endpoint.
 
@@ -219,7 +246,7 @@ class Entity(ClientMixin):
         If no api_key is provided, the global api key will be used.
         If fetch_all is True, page through all the data and find every record
         that exists.
-        If add_headers is provided (as a dict) use it to add headers to the 
+        If add_headers is provided (as a dict) use it to add headers to the
         HTTP request, eg.
 
             {'host': 'some.hidden.host'}
@@ -249,6 +276,7 @@ class Entity(ClientMixin):
                                     **query_params)
         else:
             result = cls._fetch_page(api_key=api_key, endpoint=endpoint,
+                                     maximum=maximum,
                                      **query_params)
         collection = [r for r in result
                       if not cls._find_exclude_filter(exclude, r)]
