@@ -427,7 +427,7 @@ class Entity(ClientMixin):
         return iterable.next()
 
     @classmethod
-    def create(cls, data=None, api_key=None, add_headers=None, **kwargs):
+    def create(cls, data=None, api_key=None, endpoint=None, add_headers=None, **kwargs):
         """
         Create an instance of the Entity model by calling to the API endpoint.
 
@@ -441,8 +441,12 @@ class Entity(ClientMixin):
         entity_endpoint = cls.sanitize_ep(cls.get_endpoint())
         body = {}
         body[entity_endpoint] = data
+
+        if endpoint is None:
+            endpoint = cls.get_endpoint()
+
         inst._set(cls._parse(inst.request('POST',
-                                          endpoint=cls.get_endpoint(),
+                                          endpoint=endpoint,
                                           data=body,
                                           query_params=kwargs,
                                           add_headers=add_headers,

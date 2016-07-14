@@ -122,7 +122,7 @@ class EntityTestCase(unittest.TestCase):
             data = {'service': data, }
             m.register_uri('GET', url, json=data, complete_qs=True)
 
-        services = ep.services
+        services = ep.services()
         # ensure the number of services were fetched properly
         self.assertEqual(len(services), len(ep['services']))
         # ensure all the proper services are there (by id)
