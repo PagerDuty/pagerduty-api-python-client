@@ -320,22 +320,21 @@ class Entity(ClientMixin):
 
         XXX: Clean this up. It's *too* flexible.
         """
-        params = {}
+        values = []
         output = kwargs.copy()
 
-        # try to remove any of the query parameters out of the kwargs
-        # because they should not show up in the uri string
+        # remove any of the TRANSLATE_QUERY_PARAMs in output
         for param in cls.TRANSLATE_QUERY_PARAM:
-            params[param] = kwargs.pop(param, None)
+            popped = output.pop(param, None)
+            if popped is not None:
+                values.append(popped)
 
         # if query is not provided, use the first parameter we removed from
         # the kwargs
-        if query is None:
-            iparams = ifilter(None, params.values())
-            try:
-                query = iparams.next()
-            except StopIteration:
-                pass
+        try:
+            output['query'] = ifilter(None, values).next()
+        except StopIteration:
+            pass
 
         # if query is provided, just use it
         if query is not None:
@@ -520,7 +519,7 @@ class Entity(ClientMixin):
 
         output = '<%s ' % clsname
         for k, v in info.items():
-            output += '%s=%s ' % (k, v)
+            output += '%s="%s" ' % (k, v)
         output += 'at %s>' % id_
         return output
 

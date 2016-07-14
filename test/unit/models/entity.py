@@ -1,6 +1,7 @@
 # Copyright (c) PagerDuty.
 # See LICENSE for details.
 import unittest
+from urllib import urlencode
 
 import requests_mock
 
@@ -129,10 +130,11 @@ class EntityTestCase(unittest.TestCase):
     def test_fetch_all(self, m):
         # setup mocked request uris
         for data in self.responses_data:
-            args = 'limit=%s&offset=%s' % (
-                data['limit'], data['offset'],
-            )
-            url = self.url + '?%s' % args
+            query = {
+                'limit': data['limit'],
+                'offset': data['offset'],
+            }
+            url = self.url + '?%s' % urlencode(query)
             m.register_uri('GET', url, json=data, complete_qs=True)
 
         # fetch all entities from endpoint
@@ -161,10 +163,11 @@ class EntityTestCase(unittest.TestCase):
     def test_find(self, m):
         # setup mocked request uris
         for data in self.responses_data:
-            args = 'limit=%s&offset=%s' % (
-                data['limit'], data['offset'],
-            )
-            url = self.url + '?%s' % args
+            query = {
+                'limit': data['limit'],
+                'offset': data['offset'],
+            }
+            url = self.url + '?%s' % urlencode(query)
             m.register_uri('GET', url, json=data, complete_qs=True)
 
         # try excluding by id
@@ -247,10 +250,11 @@ class EntityTestCase(unittest.TestCase):
     def test_parse(self, m):
         # setup mocked request uris
         for data in self.responses_data:
-            args = 'limit=%s&offset=%s' % (
-                1, data['offset'],
-            )
-            url = self.url + '?%s' % args
+            query = {
+                'limit': 1,
+                'offset': data['offset'],
+            }
+            url = self.url + '?%s' % urlencode(query)
             m.register_uri('GET', url, json=data, complete_qs=True)
 
         # define a class to test parsing using parse as a string
