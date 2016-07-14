@@ -6,6 +6,7 @@ from pypd.models.service import Service
 
 class EscalationPolicy(Entity):
     """PagerDuty escalation policy entity."""
+
     STR_OUTPUT_FIELDS = ('id', 'name',)
     TRANSLATE_QUERY_PARAM = ('name',)
 
@@ -13,3 +14,7 @@ class EscalationPolicy(Entity):
         """Fetch all instances of services for this EP."""
         ids = [ref['id'] for ref in self['services']]
         return map(Service.fetch, ids)
+
+    def update(self, *args, **kwargs):
+        """Update this escalation policy."""
+        raise NotImplemented
