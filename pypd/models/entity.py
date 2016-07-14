@@ -6,6 +6,7 @@ Entity module provides a base class Entity for defining a PagerDuty entity.
 Entities should be used as the base for all things that ought to be queryable
 via PagerDuty v2 API.
 """
+import re
 import logging
 import ujson as json
 from itertools import ifilter
@@ -102,10 +103,12 @@ class Entity(ClientMixin):
             self._set(_data)
 
         # sanitize the endpoint name incase people make mistakes
+        self.endpoint = self.__class__.get_endpoint()
         if self.endpoint.endswith('/'):
             logging.warn('Endpoints should not end with a trailing slash, %s',
                          self.__class__)
             self.endpoint = self.endpoint[:-1]
+
         ClientMixin.__init__(self, api_key)
 
     @staticmethod
@@ -132,6 +135,23 @@ class Entity(ClientMixin):
                 endpoint = endpoint[:-1]
 
         return endpoint
+
+    @classmethod
+    def get_endpoint(cls):
+        """
+        Accessor method to enable omition of endpoint name.
+
+        In general we want the class name to be translated to endpoint name,
+        this way unless otherwise specified will translate class name to
+        endpoint name.
+        """
+        if cls.endpoint is not None:
+            return cls.endpoint
+        s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', cls.__name__)
+        return cls.sanitize_ep(
+            re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower(),
+            plural=True
+        )
 
     @classmethod
     def _fetch_all(cls, api_key, endpoint=None, offset=0, limit=25, **kwargs):
@@ -207,7 +227,7 @@ class Entity(ClientMixin):
 
         # if maximum is valid, make the limit <= maximum
         kwargs['limit'] = min(limit, maximum) if maximum is not None else limit
-        ep = parse_key = cls.sanitize_ep(cls.endpoint, plural=True)
+        ep = parse_key = cls.sanitize_ep(cls.get_endpoint(), plural=True)
 
         # if an override to the endpoint is provided use that instead
         # this is useful for nested value searches ie. for
@@ -235,7 +255,7 @@ class Entity(ClientMixin):
         Used when you know the exact ID that must be queried.
         """
         if endpoint is None:
-            endpoint = cls.endpoint
+            endpoint = cls.get_endpoint()
 
         inst = cls(api_key=api_key)
         parse_key = cls.sanitize_ep(endpoint)
@@ -378,7 +398,7 @@ class Entity(ClientMixin):
 
         # unless otherwise specified use the class variable for the endpoint
         if endpoint is None:
-            endpoint = cls.endpoint
+            endpoint = cls.get_endpoint()
 
         if fetch_all:
             result = cls._fetch_all(api_key=api_key, endpoint=endpoint,
@@ -418,11 +438,11 @@ class Entity(ClientMixin):
         the entire entity value. A True or False response is no bueno.
         """
         inst = cls(api_key=api_key)
-        entity_endpoint = cls.sanitize_ep(cls.endpoint)
+        entity_endpoint = cls.sanitize_ep(cls.get_endpoint())
         body = {}
         body[entity_endpoint] = data
         inst._set(cls._parse(inst.request('POST',
-                                          endpoint=cls.endpoint,
+                                          endpoint=cls.get_endpoint(),
                                           data=body,
                                           query_params=kwargs,
                                           add_headers=add_headers,
@@ -434,7 +454,7 @@ class Entity(ClientMixin):
     def delete(cls, id, api_key=None, **kwargs):
         """Delete an entity from the server by ID."""
         inst = cls(api_key=api_key)
-        endpoint = '/'.join((cls.endpoint, id))
+        endpoint = '/'.join((cls.get_endpoint(), id))
         inst.request('DELETE', endpoint=endpoint, query_params=kwargs)
         inst._is_deleted = True
         return True
@@ -447,7 +467,7 @@ class Entity(ClientMixin):
         Use classmethod `parse` if available, otherwise use the `endpoint`
         class variable to extract data from a data blob.
         """
-        parse = cls.parse if cls.parse is not None else cls.endpoint
+        parse = cls.parse if cls.parse is not None else cls.get_endpoint()
 
         if callable(parse):
             data = parse(data)
@@ -512,12 +532,18 @@ class Entity(ClientMixin):
         info = {}
 
         for field in self.__class__.STR_OUTPUT_FIELDS:
+            depth = field.split('.')
+            original_field = field
             try:
-                info[field] = self[field]
+                value = self
+                while depth:
+                    field = depth.pop(0)
+                    value = value[field]
             except:
                 pass
+            info[original_field] = value
 
-        if not info.get('id'):
+        if not info.get('id') and 'id' in self.__class__.STR_OUTPUT_FIELDS:
             return '<%s uninitialized at %s>' % (clsname, id_,)
 
         output = '<%s ' % clsname

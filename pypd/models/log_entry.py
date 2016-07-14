@@ -4,4 +4,4 @@ from pypd.models.entity import Entity
 
 
 class LogEntry(Entity):
-    endpoint = 'log_entries'
+    """PagerDuty log entry entity."""

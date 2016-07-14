@@ -4,7 +4,7 @@ from pypd.models.entity import Entity
 
 
 class MaintenanceWindow(Entity):
-    endpoint = 'maintenance_windows'
+    """PagerDuty maintenance window entity."""
 
     def update(self, *args, **kwargs):
         """Update a MaintenanceWindow."""

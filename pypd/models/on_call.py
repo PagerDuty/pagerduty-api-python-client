@@ -5,7 +5,9 @@ from pypd.errors import InvalidEndpointOperation, InvalidEndpoint
 
 
 class OnCall(Entity):
-    endpoint = 'oncalls'
+    endpoint = 'oncalls'  # silly
+
+    STR_OUTPUT_FIELDS = ('escalation_level', 'user.id')
 
     @classmethod
     def fetch(*args, **kwargs):

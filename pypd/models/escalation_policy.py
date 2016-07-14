@@ -7,7 +7,6 @@ from pypd.models.service import Service
 
 
 class EscalationPolicy(Entity):
-    endpoint = 'escalation_policies'
     STR_OUTPUT_FIELDS = ('id', 'name',)
     TRANSLATE_QUERY_PARAM = ('name',)
 

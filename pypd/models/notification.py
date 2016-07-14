@@ -10,8 +10,6 @@ from pypd.errors import (InvalidArguments, InvalidEndpoint,
 class Notification(Entity):
     """A PagerDuty Notification entity."""
 
-    endpoint = 'notifications'
-
     @classmethod
     def find(cls, *args, **kwargs):
         """

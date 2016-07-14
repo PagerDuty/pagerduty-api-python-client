@@ -9,7 +9,6 @@ from pypd.models.log_entry import LogEntry
 
 
 class Incident(Entity):
-    endpoint = 'incidents'
     logEntryFactory = LogEntry
 
     def resolve(self, from_email=None, resolution=None,):

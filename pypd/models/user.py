@@ -4,7 +4,7 @@ from .entity import Entity
 
 
 class User(Entity):
-    endpoint = 'users'
+    """PagerDuty user entity."""
     STR_OUTPUT_FIELDS = ('id', 'email',)
     EXCLUDE_FILTERS = TRANSLATE_QUERY_PARAM = ('email', 'name',)
 

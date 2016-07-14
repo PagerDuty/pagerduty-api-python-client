@@ -5,7 +5,7 @@ from pypd.models.user import User
 
 
 class Team(Entity):
-    endpoint = 'teams'
+    """PagerDuty team entity."""
     STR_OUTPUT_FIELDS = ('id', 'name',)
 
     def add_user(self, user):
