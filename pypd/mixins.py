@@ -3,8 +3,10 @@ import logging
 
 import ujson as json
 import requests
+import datetime
 from numbers import Number
 
+import pypd
 from pypd.errors import (BadRequest, UnknownError, InvalidResponse,
                          InvalidHeaders)
 
@@ -54,6 +56,8 @@ class ClientMixin(object):
 
         Need to be able to inject Mocked response objects here.
         """
+        pypd.log('Doing HTTP request: {0} with headers: {1}'.format(
+            args[0], kwargs.get('headers')), level=logging.DEBUG)
         requests_method = getattr(requests, method)
         return self._handle_response(requests_method(*args, **kwargs))
 
@@ -80,13 +84,19 @@ class ClientMixin(object):
                 continue
             elif isinstance(v, Number):
                 continue
+            elif isinstance(v, datetime.datetime):
+                query_params[k] = v.isoformat()
+            elif isinstance(v, pypd.Entity):
+                query_params[k] = v['id']
             try:
                 iter(v)
             except:
                 continue
             key = '%s[]' % k
             query_params.pop(k)
-            query_params[key] = ','.join(v)
+            values = [v_['id'] if isinstance(v_, pypd.Entity) else v_
+                      for v_ in v]
+            query_params[key] = ','.join(values)
 
         kwargs = {
             'headers': headers,

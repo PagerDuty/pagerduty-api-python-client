@@ -227,16 +227,19 @@ class Entity(ClientMixin):
         return entities, response
 
     @classmethod
-    def fetch(cls, id, api_key=None, fetch_all=True, add_headers=None,
+    def fetch(cls, id, api_key=None, endpoint=None, add_headers=None,
               **kwargs):
         """
         Fetch a single entity from the API endpoint.
 
         Used when you know the exact ID that must be queried.
         """
+        if endpoint is None:
+            endpoint = cls.endpoint
+
         inst = cls(api_key=api_key)
-        parse_key = cls.sanitize_ep(cls.endpoint)
-        endpoint = '/'.join((cls.endpoint, id))
+        parse_key = cls.sanitize_ep(endpoint)
+        endpoint = '/'.join((endpoint, id))
         data = cls._parse(inst.request('GET',
                                        endpoint=endpoint,
                                        add_headers=add_headers,

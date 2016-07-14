@@ -53,8 +53,22 @@ class UnknownError(Error):
 
 
 class InvalidResponse(Error):
+    """A server response was pure nonsense."""
+
     def __init__(self, data):
         self.data = data
 
     def __str__(self):
         return 'InvalidResponse: {0}'.format(self.data)
+
+
+class InvalidArguments(Exception):
+    """A function was passed invalid arguments."""
+
+
+class InvalidEndpoint(Exception):
+    """An endpoint was accessed that is not a valid API endpoint."""
+
+
+class InvalidEndpointOperation(Exception):
+    """An invalid operation on this endpoint was accessed."""
