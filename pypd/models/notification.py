@@ -2,9 +2,9 @@
 # See LICENSE for details.
 import datetime
 
-from pypd.models.entity import Entity
-from pypd.errors import (InvalidArguments, InvalidEndpoint,
-                         InvalidEndpointOperation)
+from .entity import Entity
+from ..errors import (InvalidArguments, InvalidEndpoint,
+                      InvalidEndpointOperation)
 
 
 class Notification(Entity):

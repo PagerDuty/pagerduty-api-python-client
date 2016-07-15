@@ -7,8 +7,7 @@ import datetime
 from numbers import Number
 
 import pypd
-from pypd.errors import (BadRequest, UnknownError, InvalidResponse,
-                         InvalidHeaders)
+from .errors import (BadRequest, UnknownError, InvalidResponse, InvalidHeaders)
 
 
 CONTENT_TYPE = 'application/vnd.pagerduty+json;version=2'

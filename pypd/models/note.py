@@ -1,8 +1,8 @@
 # Copyright (c) PagerDuty.
 # See LICENSE for details.
 from .entity import Entity
-from pypd.errors import (InvalidEndpointOperation, InvalidEndpoint,
-                         InvalidArguments)
+from ..errors import (InvalidEndpointOperation, InvalidEndpoint,
+                      InvalidArguments)
 
 
 class Note(Entity):

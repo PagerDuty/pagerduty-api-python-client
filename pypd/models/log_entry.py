@@ -1,7 +1,7 @@
 # Copyright (c) PagerDuty.
 # See LICENSE for details.
-from pypd.models.entity import Entity
-from pypd.errors import InvalidEndpointOperation, InvalidEndpoint
+from .entity import Entity
+from ..errors import InvalidEndpointOperation, InvalidEndpoint
 
 
 class LogEntry(Entity):

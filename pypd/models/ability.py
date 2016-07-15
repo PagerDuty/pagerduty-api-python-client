@@ -7,7 +7,7 @@ called.
 """
 # Copyright (c) PagerDuty.
 # See LICENSE for details.
-from pypd.mixins import ClientMixin
+from ..mixins import ClientMixin
 
 
 def abilities(api_key=None, add_headers=None):

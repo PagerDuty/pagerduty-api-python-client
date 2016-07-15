@@ -11,7 +11,7 @@ import logging
 import ujson as json
 from itertools import ifilter
 
-from pypd.mixins import ClientMixin
+from ..mixins import ClientMixin
 
 
 class NotInitialized(Exception):
@@ -427,7 +427,8 @@ class Entity(ClientMixin):
         return iterable.next()
 
     @classmethod
-    def create(cls, data=None, api_key=None, endpoint=None, add_headers=None, **kwargs):
+    def create(cls, data=None, api_key=None, endpoint=None, add_headers=None,
+               **kwargs):
         """
         Create an instance of the Entity model by calling to the API endpoint.
 

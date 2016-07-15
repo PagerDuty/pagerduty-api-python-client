@@ -1,6 +1,6 @@
 # Copyright (c) PagerDuty.
 # See LICENSE for details.
-from pypd.models.entity import Entity
+from .entity import Entity
 
 
 class MaintenanceWindow(Entity):

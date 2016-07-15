@@ -1,7 +1,7 @@
 # Copyright (c) PagerDuty.
 # See LICENSE for details.
-from pypd.models.entity import Entity
-from pypd.models.user import User
+from .entity import Entity
+from .user import User
 
 
 class Team(Entity):
@@ -18,3 +18,7 @@ class Team(Entity):
         endpoint = '/'.join((self.endpoint, self.id, 'users', user))
         result = self.request('PUT', endpoint=endpoint)
         return result
+
+    def update(self, *args, **kwargs):
+        """Update this team."""
+        raise NotImplemented

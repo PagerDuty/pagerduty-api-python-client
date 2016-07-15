@@ -1,12 +1,10 @@
 # Copyright (c) PagerDuty.
 # See LICENSE for details.
-import logging
-
 import simplejson as json
 
-from pypd.models.entity import Entity
-from pypd.models.log_entry import LogEntry
-from pypd.models.note import Note
+from .entity import Entity
+from .log_entry import LogEntry
+from .note import Note
 
 
 class Incident(Entity):

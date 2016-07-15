@@ -1,7 +1,7 @@
 # Copyright (c) PagerDuty.
 # See LICENSE for details.
-from pypd.models.entity import Entity
-from pypd.models.service import Service
+from .entity import Entity
+from .service import Service
 
 
 class EscalationPolicy(Entity):
