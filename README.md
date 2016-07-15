@@ -27,11 +27,7 @@ user = pypd.User.find_one(email="jdc@pagerduty.com")
 ```
 
 ## Notes
-Currently the following models are not complete, but will be shortly!
-- `Schedule`
-- `Service`
-- `Team`
-- `User`
+All models **should** be complete CR-D complete, with the missing *update* method. Soon to be fixed. 
 
 If you need some embedded properties that don't exist, take a look at `LogEntry` or `Incident` model classes.
 
