@@ -2,21 +2,71 @@
 # See LICENSE for details.
 from .entity import Entity
 from .user import User
+from .escalation_policy import EscalationPolicy
 
 
 class Team(Entity):
     """PagerDuty team entity."""
+
     STR_OUTPUT_FIELDS = ('id', 'name',)
+    escalationPolicyFactory = EscalationPolicy
 
-    def add_user(self, user):
+    def remove_escalation_policy(self, escalation_policy, **kwargs):
+        """Remove an escalation policy from this team."""
+        if isinstance(escalation_policy, Entity):
+            escalation_policy = escalation_policy['id']
+
+        assert isinstance(escalation_policy, basestring)
+
+        endpoint = '{0}/{1}/escalation_policies/{2}'.format(
+            self.endpoint,
+            self['id'],
+            escalation_policy,
+        )
+
+        return self.request('DELETE', endpoint=endpoint, query_params=kwargs)
+
+    def add_escalation_policy(self, escalation_policy, **kwargs):
+        """Add an escalation policy to this team."""
+        if isinstance(escalation_policy, Entity):
+            escalation_policy = escalation_policy['id']
+
+        assert isinstance(escalation_policy, basestring)
+
+        endpoint = '{0}/{1}/escalation_policies/{2}'.format(
+            self.endpoint,
+            self['id'],
+            escalation_policy,
+        )
+        return self.request('PUT', endpoint=endpoint, query_params=kwargs)
+
+    def remove_user(self, user, **kwargs):
+        """Remove a user from this team."""
+        if isinstance(user, Entity):
+            user = user['id']
+
+        assert isinstance(user, basestring)
+
+        endpoint = '{0}/{1}/escalation_policies/{2}'.format(
+            self.endpoint,
+            self['id'],
+            user,
+        )
+        return self.request('DELETE', endpoint=endpoint, query_params=kwargs)
+
+    def add_user(self, user, **kwargs):
+        """Add a user to this team."""
         if isinstance(user, User):
-            user = user.id
+            user = user['id']
 
-        if not isinstance(user, basestring):
-            raise Exception('Invalid user ID provided!')
+        assert isinstance(user, basestring)
 
-        endpoint = '/'.join((self.endpoint, self.id, 'users', user))
-        result = self.request('PUT', endpoint=endpoint)
+        endpoint = '{0}/{1}/users/{2}'.format(
+            self.endpoint,
+            self['id'],
+            user,
+        )
+        result = self.request('PUT', endpoint=endpoint, query_params=kwargs)
         return result
 
     def update(self, *args, **kwargs):

@@ -268,6 +268,9 @@ class Entity(ClientMixin):
         inst._set(data)
         return inst
 
+    # sugar-pills
+    get = fetch
+
     @classmethod
     def _find_exclude_filter(cls, excludes, item):
         """
@@ -455,6 +458,9 @@ class Entity(ClientMixin):
                              key=entity_endpoint))
         return inst
 
+    # sugar-pills
+    post = create
+
     @classmethod
     def delete(cls, id, api_key=None, **kwargs):
         """Delete an entity from the server by ID."""
@@ -463,6 +469,13 @@ class Entity(ClientMixin):
         inst.request('DELETE', endpoint=endpoint, query_params=kwargs)
         inst._is_deleted = True
         return True
+
+    @classmethod
+    def put(cls, id, api_key=None, **kwargs):
+        """Delete an entity from the server by ID."""
+        inst = cls(api_key=api_key)
+        endpoint = '/'.join((cls.get_endpoint(), id))
+        return inst.request('PUT', endpoint=endpoint, query_params=kwargs)
 
     @classmethod
     def _parse(cls, data, key=None):

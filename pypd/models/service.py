@@ -23,7 +23,7 @@ class Service(Entity):
         assert isinstance(service_info, dict)
         assert (service_info['type'] in cls.ALLOWED_SERVICE_TYPES)
 
-    def create_integration(self, integration_info):
+    def create_integration(self, integration_info, **kwargs):
         """
         Create an integration for this incident.
 
@@ -40,21 +40,25 @@ class Service(Entity):
         if vendor_info is not None:
             self.vendorFactory.validate(vendor_info)
 
-        endpoint = '/'.join((self.endpoint, self.id, 'integrations'))
+        endpoint = '{0}/{1}/integrations'.format(
+            self.endpoint,
+            self['id'],
+        )
         return self.integrationFactory.create(
             endpoint=endpoint,
             api_key=self.api_key,
             data={'integration': integration_info, },
+            query_params=kwargs
         )
 
-    def integrations(self):
+    def integrations(self, **kwargs):
         """Retrieve all this services integrations."""
         ids = [ref['id'] for ref in self['integrations']]
-        return map(Integration.fetch, ids)
+        return map(Integration.fetch, ids, query_params=kwargs)
 
-    def get_integration(self, id):
+    def get_integration(self, id, **kwargs):
         """Retrieve a single integration by id."""
-        return Integration.fetch(id)
+        return Integration.fetch(id, query_params=kwargs)
 
     def update_integration(self, *args, **kwargs):
         """Update this integration on this service."""

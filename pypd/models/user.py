@@ -31,10 +31,94 @@ class User(Entity):
             add_headers=add_headers
         )
 
+    def contact_methods(self, **kwargs):
+        """Get all contact methods for this user."""
+        endpoint = '{0}/{1}/contact_methods'.format(
+            self.endpoint,
+            self['id'],
+        )
+        result = self.request('GET', endpoint=endpoint, query_params=kwargs)
+        return result['contact_methods']
+
     def create_contact_method(self, data, **kwargs):
+        """Create a contact method for this user."""
         data = {'contact_method': data, }
-        endpoint = '/'.join((self.endpoint, self.id, 'contact_methods'))
+        endpoint = '{0}/{1}/contact_methods'.format(
+            self.endpoint,
+            self['id'],
+        )
         result = self.request('POST', endpoint=endpoint, data=data,
                               query_params=kwargs)
         self._data['contact_methods'].append(result['contact_method'])
         return result
+
+    def delete_contact_method(self, id, **kwargs):
+        """Delete a contact method for this user."""
+        endpoint = '{0}/{1}/contact_methods/{2}'.format(
+            self.endpoint,
+            self['id'],
+            id,
+        )
+        return self.request('DELETE', endpoint=endpoint, query_params=kwargs)
+
+    def get_contact_method(self, id, **kwargs):
+        """Get a contact method for this user."""
+        endpoint = '{0}/{1}/contact_methods/{2}'.format(
+            self.endpoint,
+            self['id'],
+            id,
+        )
+        result = self.request('GET', endpoint=endpoint, query_params=kwargs)
+        return result['contact_method']
+
+    def notification_rules(self, **kwargs):
+        """Get all notification rules for this user."""
+        endpoint = '{0}/{1}/notification_rules'.format(
+            self.endpoint,
+            self['id'],
+        )
+        result = self.request('GET', endpoint=endpoint, query_params=kwargs)
+        return result['notification_rules']
+
+    def get_notification_rule(self, id, **kwargs):
+        """Get a notification rule for this user."""
+        endpoint = '{0}/{1}/notification_rules/{2}'.format(
+            self.endpoint,
+            self['id'],
+            id,
+        )
+        result = self.request('GET', endpoint=endpoint, query_params=kwargs)
+        return result['notification_rule']
+
+    def create_notification_rule(self, data, **kwargs):
+        """Create a notification rule for this user."""
+        data = {'notification_rule': data, }
+        endpoint = '{0}/{1}/notification_rules'.format(
+            self.endpoint,
+            self['id'],
+        )
+        result = self.request('POST', endpoint=endpoint, data=data,
+                              query_params=kwargs)
+        self._data['notification_rules'].append(result['notification_rule'])
+        return result
+
+    def delete_notification_rule(self, id, **kwargs):
+        """Get a notification rule for this user."""
+        endpoint = '{0}/{1}/notification_rules/{2}'.format(
+            self.endpoint,
+            self['id'],
+            id,
+        )
+        return self.request('DELETE', endpoint=endpoint, query_params=kwargs)
+
+    def update_contact_method(self, *args, **kwargs):
+        """Please implement me."""
+        raise NotImplemented
+
+    def update_notification_rule(self, *args, **kwargs):
+        """Please implement me."""
+        raise NotImplemented
+
+    def update(self, *args, **kwargs):
+        """Update this team."""
+        raise NotImplemented
