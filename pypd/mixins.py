@@ -85,7 +85,7 @@ class ClientMixin(object):
                 continue
             elif isinstance(v, datetime.datetime):
                 query_params[k] = v.isoformat()
-            elif isinstance(v, pypd.Entity):
+            elif isinstance(v, ClientMixin):
                 query_params[k] = v['id']
             try:
                 iter(v)
@@ -93,7 +93,7 @@ class ClientMixin(object):
                 continue
             key = '%s[]' % k
             query_params.pop(k)
-            values = [v_['id'] if isinstance(v_, pypd.Entity) else v_
+            values = [v_['id'] if isinstance(v_, ClientMixin) else v_
                       for v_ in v]
             query_params[key] = ','.join(values)
 
