@@ -6,6 +6,7 @@ from .version import __version__
 from .models.ability import can, abilities
 from .models.add_ons import AddOn
 from .models.escalation_policy import EscalationPolicy
+from .models.event import Event
 from .models.incident import Incident
 from .models.integration import Integration
 from .models.log_entry import LogEntry

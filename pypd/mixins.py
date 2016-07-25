@@ -21,15 +21,19 @@ class ClientMixin(object):
 
     def __init__(self, api_key=None, base_url=None):
         # if no api key is provided try to get one from the packages api_key
-        if api_key is None:
-            from pypd import api_key
-            api_key = api_key
-        self.api_key = api_key
+        if api_key:
+            self.api_key = api_key
 
-        if base_url is None:
+        if self.api_key is None:
+            from pypd import api_key
+            self.api_key = api_key
+
+        if base_url:
+            self.base_url = base_url
+
+        if self.base_url is None:
             from pypd import base_url
-            base_url = base_url
-        self.base_url = base_url
+            self.base_url = base_url
 
     def _handle_response(self, response):
         if response.status_code == 404:

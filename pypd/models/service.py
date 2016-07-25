@@ -30,7 +30,6 @@ class Service(Entity):
         See: https://v2.developer.pagerduty.com/v2/page/api-reference#!/
               Services/post_services_id_integrations
         """
-        self.integrationFactory.validate(integration_info)
         service_info = integration_info.get('service')
         vendor_info = integration_info.get('vendor')
 
@@ -47,7 +46,7 @@ class Service(Entity):
         return self.integrationFactory.create(
             endpoint=endpoint,
             api_key=self.api_key,
-            data={'integration': integration_info, },
+            data=integration_info,
             query_params=kwargs
         )
 
@@ -66,3 +65,4 @@ class Service(Entity):
 
     # sugar-pills
     view_integration = get_integration
+    add_integration = create_integration

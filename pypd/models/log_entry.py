@@ -6,6 +6,7 @@ from ..errors import InvalidEndpointOperation, InvalidEndpoint
 
 class LogEntry(Entity):
     """PagerDuty log entry entity."""
+    STR_OUTPUT_FIELDS = ('id', 'type',)
 
     @classmethod
     def create(*args, **kwargs):

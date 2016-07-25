@@ -9,23 +9,23 @@ class Integration(Entity):
     """PagerDuty note entity."""
 
     ALLOWED_INTEGRATION_TYPES = [
-        # 'aws_cloudwatch_inbound_integration',
+        'aws_cloudwatch_inbound_integration',
         'aws_cloudwatch_inbound_integration_reference',
-        # 'cloudkick_inbound_integration',
+        'cloudkick_inbound_integration',
         'cloudkick_inbound_integration_reference',
-        # 'event_transformer_api_inbound_integration',
+        'event_transformer_api_inbound_integration',
         'event_transformer_api_inbound_integration_reference',
-        # 'generic_email_inbound_integration',
+        'generic_email_inbound_integration',
         'generic_email_inbound_integration_reference',
-        # 'generic_events_api_inbound_integration',
+        'generic_events_api_inbound_integration',
         'generic_events_api_inbound_integration_reference',
-        # 'keynote_inbound_integration',
+        'keynote_inbound_integration',
         'keynote_inbound_integration_reference',
-        # 'nagios_inbound_integration',
+        'nagios_inbound_integration',
         'nagios_inbound_integration_reference',
-        # 'pingdom_inbound_integration',
+        'pingdom_inbound_integration',
         'pingdom_inbound_integration_reference',
-        # 'sql_monitor_inbound_integration',
+        'sql_monitor_inbound_integration',
         'sql_monitor_inbound_integration_reference',
     ]
 
@@ -67,7 +67,7 @@ class Integration(Entity):
         Make sure that they should reasonably be able to query with an
         service or endpoint that knows about an service.
         """
-        cls._validate(data)
+        cls.validate(data)
 
         if service is None and endpoint is None:
             raise InvalidArguments(service, endpoint)
@@ -75,6 +75,7 @@ class Integration(Entity):
             sid = service['id'] if isinstance(service, Entity) else service
             endpoint = '/services/{0}/integrations'.format(sid)
 
+        print data
         # otherwise endpoint should contain the service path too
         getattr(Entity, 'create').im_func(cls, endpoint=endpoint, data=data,
                                           *args, **kwargs)
