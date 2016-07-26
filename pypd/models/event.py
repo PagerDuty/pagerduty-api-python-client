@@ -45,9 +45,9 @@ class Event(Entity):
         cls.validate(data)
         inst = cls(api_key=api_key)
         endpoint = ''
-        print inst.request('POST',
-                           endpoint=endpoint,
-                           data=data,
-                           query_params=kwargs,
-                           add_headers=add_headers,
-                           )
+        return inst.request('POST',
+                            endpoint=endpoint,
+                            data=data,
+                            query_params=kwargs,
+                            add_headers=add_headers,
+                            )

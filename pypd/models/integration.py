@@ -75,7 +75,6 @@ class Integration(Entity):
             sid = service['id'] if isinstance(service, Entity) else service
             endpoint = '/services/{0}/integrations'.format(sid)
 
-        print data
         # otherwise endpoint should contain the service path too
         getattr(Entity, 'create').im_func(cls, endpoint=endpoint, data=data,
                                           *args, **kwargs)
