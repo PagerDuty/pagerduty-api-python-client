@@ -24,6 +24,20 @@ log_entries = incident.log_entries()
 
 # find users
 user = pypd.User.find_one(email="jdc@pagerduty.com")
+
+# create an event
+Event.create(data={
+    'service_key': 'YOUR_INTEGRATION_KEY',
+    'event_type': 'trigger',
+    'description': 'this is a trigger event!',
+    'contexts': [
+          {
+              'type': 'link',
+              'href': 'http://acme.pagerduty.com',
+              'text': 'View on PD',
+          },
+    ],
+})
 ```
 
 ## Notes
