@@ -26,7 +26,7 @@ log_entries = incident.log_entries()
 user = pypd.User.find_one(email="jdc@pagerduty.com")
 
 # create an event
-Event.create(data={
+pypd.Event.create(data={
     'service_key': 'YOUR_INTEGRATION_KEY',
     'event_type': 'trigger',
     'description': 'this is a trigger event!',
