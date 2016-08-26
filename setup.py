@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from setuptools import setup
+from setuptools import setup, find_packages
 
 with open('pypd/version.py') as version_file:
     exec(compile(version_file.read(), version_file.name, 'exec'))
