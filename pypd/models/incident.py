@@ -1,6 +1,6 @@
 # Copyright (c) PagerDuty.
 # See LICENSE for details.
-import simplejson as json
+import ujson as json
 
 from .entity import Entity
 from .log_entry import LogEntry
