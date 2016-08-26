@@ -7,7 +7,7 @@ with open('pypd/version.py') as version_file:
 options = {
     'name': 'pypd',
     'version': __version__,
-    'packages': ['pypd'],
+    'packages': find_packages(),
     'scripts': [],
     'description': 'A python client for PagerDuty API',
     'author': 'JD Cumpson',
