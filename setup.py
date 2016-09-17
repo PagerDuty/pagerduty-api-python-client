@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from setuptools import setup
+from setuptools import setup, find_packages
 
 with open('pypd/version.py') as version_file:
     exec(compile(version_file.read(), version_file.name, 'exec'))
@@ -7,7 +7,7 @@ with open('pypd/version.py') as version_file:
 options = {
     'name': 'pypd',
     'version': __version__,
-    'packages': ['pypd'],
+    'packages': find_packages(),
     'scripts': [],
     'description': 'A python client for PagerDuty API',
     'author': 'JD Cumpson',
