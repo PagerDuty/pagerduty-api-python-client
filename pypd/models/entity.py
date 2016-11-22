@@ -7,11 +7,11 @@ Entities should be used as the base for all things that ought to be queryable
 via PagerDuty v2 API.
 """
 import re
-import logging
 import ujson as json
 from itertools import ifilter
 
 from ..mixins import ClientMixin
+from ..log import warn
 
 
 class NotInitialized(Exception):
@@ -105,8 +105,8 @@ class Entity(ClientMixin):
         # sanitize the endpoint name incase people make mistakes
         self.endpoint = self.__class__.get_endpoint()
         if self.endpoint.endswith('/'):
-            logging.warn('Endpoints should not end with a trailing slash, %s',
-                         self.__class__)
+            warn('Endpoints should not end with a trailing slash, %s',
+                 self.__class__)
             self.endpoint = self.endpoint[:-1]
 
         ClientMixin.__init__(self, api_key)

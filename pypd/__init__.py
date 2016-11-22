@@ -1,3 +1,4 @@
+
 # Copyright (c) PagerDuty.
 # See LICENSE for details.
 import logging
@@ -22,30 +23,3 @@ from .models.vendor import Vendor
 
 api_key = None
 base_url = 'https://api.pagerduty.com'
-logger = logging.getLogger('pypd')
-verbosity = 1
-
-
-def set_logger(new_logger):
-    """
-    Set the global logger for pypd to use.
-
-    Assumes a logging.Logger interface.
-    """
-    global logger
-    logger = new_logger
-    return logger
-
-
-def set_verbosity(level=1):
-    """Set logging verbosity level, 0 is lowest."""
-    global verbosity
-    verbosity = level
-    return verbosity
-
-
-def log(*args, **kwargs):
-    """Log things with the global logger."""
-    import pypd
-    level = kwargs.pop('level', logging.INFO)
-    pypd.logger.log(level, *args, **kwargs)
