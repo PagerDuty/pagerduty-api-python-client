@@ -8,7 +8,7 @@ import pypd
 pypd.api_key = "SOMESECRETAPIKEY"
 
 # fetch some dataz
-incidents = pypd.Incidents.find(maximum=10)
+incidents = pypd.Incident.find(maximum=10)
 
 # how do dataz?
 ep = pypd.EscalationPolicy.find_one()
