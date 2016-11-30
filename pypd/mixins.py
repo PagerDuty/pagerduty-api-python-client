@@ -99,7 +99,7 @@ class ClientMixin(object):
             query_params.pop(k)
             values = [v_['id'] if isinstance(v_, ClientMixin) else v_
                       for v_ in v]
-            query_params[key] = ','.join(values)
+            query_params[key] = values
 
         kwargs = {
             'headers': headers,
