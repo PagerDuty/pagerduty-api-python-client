@@ -22,8 +22,11 @@ options = {
         'Topic :: Software Development :: Libraries',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
-    'install_requires': ['ujson', 'requests'],
+    'install_requires': ['requests'],
     'tests_require': [],
+    'extras_require': {
+        'ujson': 'ujson',
+    },
     'cmdclass': {}
 }
 

@@ -7,7 +7,10 @@ Entities should be used as the base for all things that ought to be queryable
 via PagerDuty v2 API.
 """
 import re
-import ujson as json
+try:
+    import ujson as json
+except ImportError:
+    import json
 
 from ..mixins import ClientMixin
 from ..log import warn

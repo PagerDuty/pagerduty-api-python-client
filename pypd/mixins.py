@@ -1,10 +1,13 @@
 """Helpful mixins for PagerDuty entity classes."""
-import logging
-
-import ujson as json
-import requests
 import datetime
+import logging
+try:
+    import ujson as json
+except ImportError:
+    import json
 from numbers import Number
+
+import requests
 
 from .log import log
 from .errors import (BadRequest, UnknownError, InvalidResponse, InvalidHeaders)
