@@ -8,7 +8,6 @@ via PagerDuty v2 API.
 """
 import re
 import ujson as json
-from itertools import ifilter
 
 from ..mixins import ClientMixin
 from ..log import warn
@@ -358,7 +357,7 @@ class Entity(ClientMixin):
         # if query is not provided, use the first parameter we removed from
         # the kwargs
         try:
-            output['query'] = ifilter(None, values).next()
+            output['query'] = iter(values).next()
         except StopIteration:
             pass
 
