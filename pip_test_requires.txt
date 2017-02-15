@@ -1,4 +1,3 @@
-Mock
-unittest
-ujson
+mock
 requests
+requests_mock

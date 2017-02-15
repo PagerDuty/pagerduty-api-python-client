@@ -12,7 +12,7 @@ try:
 except ImportError:
     import json
 
-from ..mixins import ClientMixin
+from ..mixins import ClientMixin, stringtype
 from ..log import warn
 
 
@@ -244,7 +244,7 @@ class Entity(ClientMixin):
         # to do the parsing out of something and then return everything else
         datas = cls._parse(response, key=parse_key)
         response.pop(parse_key, None)
-        entities = map(lambda d: cls(api_key=api_key, _data=d), datas)
+        entities = [cls(api_key=api_key, _data=d) for d in datas]
         # return a tuple
         return entities, response
 
@@ -360,7 +360,7 @@ class Entity(ClientMixin):
         # if query is not provided, use the first parameter we removed from
         # the kwargs
         try:
-            output['query'] = iter(values).next()
+            output['query'] = next(iter(values))
         except StopIteration:
             pass
 
@@ -393,7 +393,7 @@ class Entity(ClientMixin):
         query = kwargs.pop('query', None)
 
         # if exclude param was passed a a string, list-ify it
-        if isinstance(exclude, basestring):
+        if isinstance(exclude, stringtype):
             exclude = [exclude, ]
 
         if cls.TRANSLATE_QUERY_PARAM:
@@ -429,7 +429,7 @@ class Entity(ClientMixin):
 
         # call find and extract the first iterated value from the result
         iterable = iter(cls.find(*args, **kwargs))
-        return iterable.next()
+        return next(iterable)
 
     @classmethod
     def create(cls, data=None, api_key=None, endpoint=None, add_headers=None,

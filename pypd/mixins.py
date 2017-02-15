@@ -6,6 +6,7 @@ try:
 except ImportError:
     import json
 from numbers import Number
+import sys
 
 import requests
 
@@ -16,6 +17,12 @@ from .errors import (BadRequest, UnknownError, InvalidResponse, InvalidHeaders)
 CONTENT_TYPE = 'application/vnd.pagerduty+json;version=2'
 AUTH_TEMPLATE = 'Token token={0}'
 BASIC_AUTH_TEMPLATE = 'Basic {0}'
+
+
+if sys.version_info[0] < 3:
+    stringtype = basestring
+else:
+    stringtype = str
 
 
 class ClientMixin(object):
@@ -41,9 +48,9 @@ class ClientMixin(object):
     def _handle_response(self, response):
         if response.status_code == 404:
             response.raise_for_status()
-        elif response.status_code / 100 == 4:
+        elif response.status_code // 100 == 4:
             raise BadRequest(response.status_code, response.text)
-        elif response.status_code / 100 != 2:
+        elif response.status_code // 100 != 2:
             raise UnknownError(response.status_code, response.text)
 
         if not response.text:
@@ -86,7 +93,7 @@ class ClientMixin(object):
             headers.update(**add_headers)
 
         for k, v in query_params.items():
-            if isinstance(v, basestring):
+            if isinstance(v, stringtype):
                 continue
             elif isinstance(v, Number):
                 continue

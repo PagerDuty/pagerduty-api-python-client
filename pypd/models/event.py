@@ -8,6 +8,7 @@ via PagerDuty v2 API.
 """
 
 from .entity import Entity
+from ..mixins import stringtype
 
 
 class Event(Entity):
@@ -19,12 +20,12 @@ class Event(Entity):
     def validate(cls, event_info):
         """Validate that provided event information is valid."""
         assert 'service_key' in event_info
-        assert isinstance(event_info['service_key'], basestring)
+        assert isinstance(event_info['service_key'], stringtype)
         assert 'event_type' in event_info
         assert event_info['event_type'] in cls.EVENT_TYPES
         if event_info['event_type'] != cls.EVENT_TYPES[0]:
             assert 'incident_key' in event_info
-            assert isinstance(event_info['incident_key'], basestring)
+            assert isinstance(event_info['incident_key'], stringtype)
         else:
             assert 'description' in event_info
 
