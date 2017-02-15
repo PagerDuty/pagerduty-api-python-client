@@ -48,7 +48,7 @@ If you need some embedded properties that don't exist, take a look at `LogEntry`
 ## Tests
 Run all the tests (unittests only currently) with:
 ```sh
-python test/runtests.py [-vvv]
+tox
 ```
 
 ## Links
