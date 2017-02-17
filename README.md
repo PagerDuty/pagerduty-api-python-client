@@ -52,6 +52,8 @@ All models **should** be complete CR-D complete, with the missing *update* metho
 
 If you need some embedded properties that don't exist, take a look at `LogEntry` or `Incident` model classes.
 
+There was some stagnation on the pull requests here. No longer! Thanks for being patient.
+
 ## Tests
 Make sure that you have installed the test requirements
 ```sh
@@ -65,7 +67,7 @@ tox
 
 ## Links
 
-An asynchronous port of this library for [Twisted](http://twistedmatrix.com) exists [txpypd](https://github.com/PagerDuty/txpypd) and is on it's way to catching up now.
+Do you develop **twisted** applications? An asynchronous port of this library for [Twisted](http://twistedmatrix.com) exists [txpypd](https://github.com/PagerDuty/txpypd) and is on it's way to catching up now.
 
 ## Contributing
 All help is welcome. Unittests are great to have more of. Suggestions welcome.
