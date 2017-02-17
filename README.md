@@ -55,11 +55,6 @@ If you need some embedded properties that don't exist, take a look at `LogEntry`
 There was some stagnation on the pull requests here. No longer! Thanks for being patient.
 
 ## Tests
-Make sure that you have installed the test requirements
-```sh
-pip install -r test_requirements.txt
-```
-
 Run all the tests (unittests only currently) with:
 ```sh
 tox
