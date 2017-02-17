@@ -232,22 +232,46 @@ class EntityTestCase(unittest.TestCase):
         # expect that the excluded one is correctly Entity 1
         self.assertNotEqual(entities[0]['name'], 'Entity 1')
 
-    def test_translate_query_params(self):
+    def test_translate_query_params_with_name(self):
         class TranslateNameQueryParam(Entity):
             TRANSLATE_QUERY_PARAM = ('name',)
 
-        query = 'PlopperDuty'
         kwargs = {
             'name': 'PagerDuty',
         }
 
-        # ensure explicitly set query works
-        qp = TranslateNameQueryParam.translate_query_params(query, **kwargs)
-        self.assertEqual(qp['query'], query)
-
         # ensure fallback query works using TRANSLATE_QUERY_PARAM
         qp = TranslateNameQueryParam.translate_query_params(**kwargs)
         self.assertEqual(qp['query'], kwargs['name'])
+        self.assertNotIn('name', qp)
+
+
+    def test_translate_query_params_with_name_and_query(self):
+        class TranslateNameQueryParam(Entity):
+            TRANSLATE_QUERY_PARAM = ('name',)
+
+        kwargs = {
+            'name': 'PagerDuty',
+            'query': 'PlopperDuty',
+        }
+
+        qp = TranslateNameQueryParam.translate_query_params(**kwargs)
+        self.assertEqual(qp['query'], kwargs['query'])
+        self.assertNotIn('name', qp)
+
+
+    def test_translate_query_params_with_name_and_query_no_translation(self):
+        class TranslateNameQueryParam(Entity):
+            TRANSLATE_QUERY_PARAM = None
+
+        kwargs = {
+            'name': 'PagerDuty',
+            'query': 'PlopperDuty',
+        }
+
+        qp = TranslateNameQueryParam.translate_query_params(**kwargs)
+        self.assertEqual(qp['query'], kwargs['query'])
+        self.assertEqual(qp['name'], kwargs['name'])
 
     @requests_mock.Mocker()
     def test_parse(self, m):

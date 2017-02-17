@@ -13,7 +13,7 @@ except ImportError:
     import json
 
 from ..mixins import ClientMixin, stringtype
-from ..log import warn
+from ..log import warn, debug
 
 
 class NotInitialized(Exception):
@@ -96,7 +96,7 @@ class Entity(ClientMixin):
     _is_deleted = False
     EXCLUDE_FILTERS = ('name',)  # exclude will filter on these properties
     STR_OUTPUT_FIELDS = ('id',)  # fields to output in __str__
-    TRANSLATE_QUERY_PARAM = None  # translates uri?query=stuff
+    TRANSLATE_QUERY_PARAM = ('name',)  # translates uri?query=stuff
     MAX_LIMIT_VALUE = 100
 
     def __init__(self, api_key=None, _data=None):
@@ -313,9 +313,12 @@ class Entity(ClientMixin):
         return any(map(test_each_exclude, excludes))
 
     @classmethod
-    def translate_query_params(cls, query=None, **kwargs):
+    def translate_query_params(cls, **kwargs):
         """
         Translate an arbirtary keyword argument to the expected query.
+
+        TODO: refactor this into something less insane.
+        XXX: Clean this up. It's *too* flexible.
 
         In the v2 API, many endpoints expect a particular query argument to be
         in the form of `query=xxx` where `xxx` would be the name of perhaps
@@ -332,30 +335,40 @@ class Entity(ClientMixin):
 
         Eg. No query param
 
-            query = None
             TRANSLATE_QUERY_PARAM = ('name',)
-            kwargs = {'name': 'PagerDuty'}
+            kwargs = {'name': 'PagerDuty',}
             ...
             output = {'query': 'PagerDuty'}
 
         or, query param explicitly
 
-            query = 'XXXXPlopperDuty'
             TRANSLATE_QUERY_PARAM = ('name',)
-            kwargs = {'name': 'PagerDuty'}
+            kwargs = {'name': 'PagerDuty', 'query': 'XXXXPlopperDuty'}
             ...
             output = {'query': 'XXXXPlopperDuty'}
 
-        XXX: Clean this up. It's *too* flexible.
+        or, TRANSLATE_QUERY_PARAM is None
+
+            TRANSLATE_QUERY_PARAM = None
+            kwargs = {'name': 'PagerDuty', 'query': 'XXXXPlopperDuty'}
+            ...
+            output = {'output': 'XXXXPlopperDuty', 'name': 'PagerDuty'}
+
         """
         values = []
         output = kwargs.copy()
+        query = kwargs.pop('query', None)
 
         # remove any of the TRANSLATE_QUERY_PARAMs in output
-        for param in cls.TRANSLATE_QUERY_PARAM:
+        for param in (cls.TRANSLATE_QUERY_PARAM or []):
             popped = output.pop(param, None)
             if popped is not None:
                 values.append(popped)
+
+        # if query is provided, just use it
+        if query is not None:
+            output['query'] = query
+            return output
 
         # if query is not provided, use the first parameter we removed from
         # the kwargs
@@ -363,10 +376,6 @@ class Entity(ClientMixin):
             output['query'] = next(iter(values))
         except StopIteration:
             pass
-
-        # if query is provided, just use it
-        if query is not None:
-            output['query'] = query
 
         return output
 
@@ -390,16 +399,12 @@ class Entity(ClientMixin):
         instant method `request` (ClientMixin).
         """
         exclude = kwargs.pop('exclude', None)
-        query = kwargs.pop('query', None)
 
         # if exclude param was passed a a string, list-ify it
         if isinstance(exclude, stringtype):
             exclude = [exclude, ]
 
-        if cls.TRANSLATE_QUERY_PARAM:
-            query_params = cls.translate_query_params(query, **kwargs)
-        else:
-            query_params = kwargs
+        query_params = cls.translate_query_params(**kwargs)
 
         # unless otherwise specified use the class variable for the endpoint
         if endpoint is None:

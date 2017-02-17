@@ -39,3 +39,8 @@ def warn(*args, **kwargs):
 def error(*args, **kwargs):
     kwargs.pop('level', None)
     logger.log(logging.ERROR, *args, **kwargs)
+
+
+def debug(*args, **kwargs):
+    kwargs.pop('level', None)
+    logger.log(logging.DEBUG, *args, **kwargs)
