@@ -13,7 +13,7 @@ class EscalationPolicy(Entity):
     def services(self):
         """Fetch all instances of services for this EP."""
         ids = [ref['id'] for ref in self['services']]
-        return map(Service.fetch, ids)
+        return [Service.fetch(id) for id in ids]
 
     def update(self, *args, **kwargs):
         """Update this escalation policy."""

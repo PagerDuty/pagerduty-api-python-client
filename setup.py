@@ -18,12 +18,17 @@ options = {
     'download_url': 'https://github.com/PagerDuty/pypd/archive/master.tar.gz',
     'classifiers': [
         'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 3',
         'Topic :: Software Development',
         'Topic :: Software Development :: Libraries',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
-    'install_requires': ['ujson', 'requests'],
+    'install_requires': ['requests'],
     'tests_require': [],
+    'extras_require': {
+        'ujson': 'ujson',
+    },
     'cmdclass': {}
 }
 

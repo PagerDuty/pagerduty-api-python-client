@@ -1,6 +1,9 @@
 # Copyright (c) PagerDuty.
 # See LICENSE for details.
-import ujson as json
+try:
+    import ujson as json
+except ImportError:
+    import json
 
 from .entity import Entity
 from .log_entry import LogEntry

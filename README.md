@@ -3,6 +3,13 @@ A client in Python for PagerDuty's v2 API.
 
 ## How Do
 Yes, how do. The ultimate question in quickstart.
+
+Make sure that you have installed requirements with pip
+```sh
+pip install -r requirements.txt
+```
+
+Then get cracking
 ```python
 import pypd
 pypd.api_key = "SOMESECRETAPIKEY"
@@ -41,14 +48,19 @@ pypd.Event.create(data={
 ```
 
 ## Notes
-All models **should** be complete CR-D complete, with the missing *update* method. Soon to be fixed. 
+All models **should** be complete CR-D complete, with the missing *update* method. Soon to be fixed.
 
 If you need some embedded properties that don't exist, take a look at `LogEntry` or `Incident` model classes.
 
 ## Tests
+Make sure that you have installed the test requirements
+```sh
+pip install -r test_requirements.txt
+```
+
 Run all the tests (unittests only currently) with:
 ```sh
-python test/runtests.py [-vvv]
+tox
 ```
 
 ## Links
@@ -62,7 +74,7 @@ All help is welcome. Unittests are great to have more of. Suggestions welcome.
 All the code in this distribution is Copyright (c) 2016 PagerDuty.
 
 
-pypd is availabe under the MIT License. The [LICENSE](LICENSE) file has 
+pypd is availabe under the MIT License. The [LICENSE](LICENSE) file has
 the complete details.
 
 

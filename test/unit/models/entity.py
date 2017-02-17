@@ -1,7 +1,10 @@
 # Copyright (c) PagerDuty.
 # See LICENSE for details.
 import unittest
-from urllib import urlencode
+try:
+    from urllib import urlencode
+except:
+    from urllib.parse import urlencode
 
 import requests_mock
 

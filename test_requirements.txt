@@ -1,0 +1,4 @@
+tox
+mock
+requests
+requests_mock
