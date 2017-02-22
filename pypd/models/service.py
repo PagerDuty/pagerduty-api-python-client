@@ -53,7 +53,7 @@ class Service(Entity):
     def integrations(self, **kwargs):
         """Retrieve all this services integrations."""
         ids = [ref['id'] for ref in self['integrations']]
-        return map(Integration.fetch, ids, query_params=kwargs)
+        return [Integration.fetch(id, query_params=kwargs) for id in ids]
 
     def get_integration(self, id, **kwargs):
         """Retrieve a single integration by id."""

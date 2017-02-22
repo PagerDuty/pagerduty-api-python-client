@@ -20,7 +20,7 @@ if __name__ == "__main__":
     path = os.path.join(basepath, 'sample_escalation_policies.json')
     with open(path, 'w') as f:
         eps = pypd.EscalationPolicy.find()
-        raw = map(lambda ep: ep.json, eps)
+        raw = [ep.json for ep in eps]
         f.truncate()
         f.write(json.dumps(raw, indent=4))
         f.flush()
@@ -28,7 +28,7 @@ if __name__ == "__main__":
     path = os.path.join(basepath, 'sample_services.json')
     with open(path, 'w') as f:
         services = pypd.Service.find()
-        raw = map(lambda service: service.json, services)
+        raw = [service.json for service in services]
         f.truncate()
         f.write(json.dumps(raw, indent=4))
         f.flush()

@@ -109,8 +109,8 @@ class EntityTestCase(unittest.TestCase):
         ep = EscalationPolicy.find_one(api_key=self.api_key)
         # intersect the escalation policy service data with the service data
         # found in sample_services.json
-        service_ids = set(map(itemgetter('id'), self.service_data))
-        ep_service_ids = set(map(itemgetter('id'), ep['services']))
+        service_ids = set(service['id'] for service in self.service_data)
+        ep_service_ids = set(service['id'] for service in ep['services'])
         intersect = service_ids.intersection(ep_service_ids)
 
         # setup fetch url requests with requests_mock using actual data from
@@ -128,7 +128,7 @@ class EntityTestCase(unittest.TestCase):
         # ensure the number of services were fetched properly
         self.assertEqual(len(services), len(ep['services']))
         # ensure all the proper services are there (by id)
-        diff = set(map(itemgetter('id'), services))\
+        diff = set(service['id'] for service in services)\
             .difference(set(ep_service_ids))
         self.assertEqual(len(diff), 0)
 
