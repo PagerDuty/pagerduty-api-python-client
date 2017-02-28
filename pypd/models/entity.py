@@ -260,7 +260,7 @@ class Entity(ClientMixin):
             endpoint = cls.get_endpoint()
 
         inst = cls(api_key=api_key)
-        parse_key = cls.sanitize_ep(endpoint)
+        parse_key = cls.sanitize_ep(endpoint).split("/")[-1]
         endpoint = '/'.join((endpoint, id))
         data = cls._parse(inst.request('GET',
                                        endpoint=endpoint,
