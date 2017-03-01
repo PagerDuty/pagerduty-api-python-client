@@ -43,7 +43,7 @@ class Integration(Entity):
 
         if endpoint is None:
             sid = service['id'] if isinstance(service, Entity) else service
-            endpoint = '/services/{0}/integrations'.format(sid)
+            endpoint = 'services/{0}/integrations'.format(sid)
 
         return getattr(Entity, 'fetch').im_func(cls, id, endpoint=endpoint,
                                                 *args, **kwargs)
@@ -73,7 +73,7 @@ class Integration(Entity):
             raise InvalidArguments(service, endpoint)
         if endpoint is None:
             sid = service['id'] if isinstance(service, Entity) else service
-            endpoint = '/services/{0}/integrations'.format(sid)
+            endpoint = 'services/{0}/integrations'.format(sid)
 
         # otherwise endpoint should contain the service path too
         getattr(Entity, 'create').im_func(cls, endpoint=endpoint, data=data,

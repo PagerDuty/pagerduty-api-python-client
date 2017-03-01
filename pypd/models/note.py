@@ -33,7 +33,7 @@ class Note(Entity):
             raise InvalidArguments(incident, endpoint)
         if endpoint is None:
             iid = incident['id'] if isinstance(incident, Entity) else incident
-            endpoint = '/incidents/{0}/notes'.format(iid)
+            endpoint = 'incidents/{0}/notes'.format(iid)
 
         # otherwise endpoint should contain the incident path too
         getattr(Entity, 'create').im_func(cls, endpoint=endpoint, *args,
