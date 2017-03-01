@@ -53,11 +53,11 @@ class Service(Entity):
     def integrations(self, **kwargs):
         """Retrieve all this services integrations."""
         ids = [ref['id'] for ref in self['integrations']]
-        return [Integration.fetch(id, query_params=kwargs) for id in ids]
+        return [Integration.fetch(id, service=self, query_params=kwargs) for id in ids]
 
     def get_integration(self, id, **kwargs):
         """Retrieve a single integration by id."""
-        return Integration.fetch(id, query_params=kwargs)
+        return Integration.fetch(id, service=self, query_params=kwargs)
 
     def update_integration(self, *args, **kwargs):
         """Update this integration on this service."""

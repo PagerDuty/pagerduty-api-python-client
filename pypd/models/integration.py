@@ -43,10 +43,10 @@ class Integration(Entity):
 
         if endpoint is None:
             sid = service['id'] if isinstance(service, Entity) else service
-            endpoint = '/incidents/{0}/integrations/{1}'.format(sid, id)
+            endpoint = '/services/{0}/integrations'.format(sid)
 
-        getattr(Entity, 'fetch').im_func(cls, endpoint=endpoint, *args,
-                                         **kwargs)
+        return getattr(Entity, 'fetch').im_func(cls, id, endpoint=endpoint,
+                                                *args, **kwargs)
 
     @classmethod
     def delete(*args, **kwargs):
