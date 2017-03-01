@@ -13,7 +13,7 @@ except ImportError:
     import json
 
 from ..mixins import ClientMixin, stringtype
-from ..log import warn, debug
+from ..log import warn
 
 
 class NotInitialized(Exception):
@@ -549,13 +549,18 @@ class Entity(ClientMixin):
         """Return a valid JSON string dump of the entity data."""
         return json.dumps(self._data)
 
+    def __iter__(self):
+        """Return an iterable key object."""
+        if not self._data:
+            return iter({})
+        return iter(self._data.copy())
+
     def __str__(self):
         """Return a more meaningful class string."""
         id_ = hex(id(self))
         clsname = self.__class__.__name__
 
         info = {}
-
         for field in self.__class__.STR_OUTPUT_FIELDS:
             depth = field.split('.')
             original_field = field
@@ -566,6 +571,7 @@ class Entity(ClientMixin):
                     value = value[field]
             except:
                 pass
+
             info[original_field] = value
 
         if not info.get('id') and 'id' in self.__class__.STR_OUTPUT_FIELDS:

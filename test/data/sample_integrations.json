@@ -1,0 +1,50 @@
+[
+    {
+        "id": "P1ONR10",
+        "type": "event_transformer_api_inbound_integration_reference",
+        "summary": "Amazon Cloudwatch",
+        "self": "https://api.pagerduty.com/services/P91VIE2/integrations/P1ONR10",
+        "html_url": "https://subdomain.pagerduty.com/services/P91VIE2/integrations/P1ONR10",
+        "name": "Email",
+        "service": {
+            "id": "P91VIE2",
+            "type": "service_reference",
+            "summary": "A Checkout Cart",
+            "self": "https://api.pagerduty.com/services/P91VIE2",
+            "html_url": "https://subdomain.pagerduty.com/services/P91VIE2"
+        },
+        "created_at": "2015-10-14T13:33:02-07:00",
+        "vendor": {
+            "id": "P8JX75F",
+            "type": "vendor_reference",
+            "summary": "Amazon",
+            "self": "https://api.pagerduty.com/vendors/P8JX75F",
+            "html_url": null
+        },
+        "integration_email": "my-email-based-integration@subdomain.pagerduty.com"
+    },
+    {
+        "id": "PSEPH1A",
+        "type": "generic_events_api_inbound_integration_reference",
+        "summary": "New Relic",
+        "self": "https://api.pagerduty.com/services/P91VIE2/integrations/PSEPH1A",
+        "html_url": "https://subdomain.pagerduty.com/services/P91VIE2/integrations/PSEPH1A",
+        "name": "Email",
+        "service": {
+            "id": "P91VIE2",
+            "type": "service_reference",
+            "summary": "A Checkout Cart",
+            "self": "https://api.pagerduty.com/services/P91VIE2",
+            "html_url": "https://subdomain.pagerduty.com/services/P91VIE2"
+        },
+        "created_at": "2015-10-14T13:33:02-07:00",
+        "vendor": {
+            "id": "P8JX75F",
+            "type": "vendor_reference",
+            "summary": "New Relic",
+            "self": "https://api.pagerduty.com/vendors/P8JX75F",
+            "html_url": null
+        },
+        "integration_email": "my-email-based-integration@subdomain.pagerduty.com"
+    }
+]
