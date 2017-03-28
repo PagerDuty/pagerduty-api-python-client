@@ -43,7 +43,7 @@ class Notification(Entity):
         kwargs['since'] = since.isoformat()
         kwargs['until'] = until.isoformat()
 
-        return getattr(Entity, 'find').im_func(cls, *args, **kwargs)
+        return getattr(Entity, 'find').__func__(cls, *args, **kwargs)
 
     @classmethod
     def fetch(*args, **kwargs):

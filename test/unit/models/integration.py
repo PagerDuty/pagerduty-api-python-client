@@ -37,19 +37,19 @@ class IntegrationTestCase(unittest.TestCase):
         # use a particular service because of not wanting to enumerate multiple
         # integration endpoints in json
         self.service_id = 'P91VIE2'
-        self.service = filter(
+        self.service = list(filter(
             lambda s: s['id'] == self.service_id,
             self.service_data,
-        )[0]
+        ))[0]
 
         self.service_data = {
             'service': self.service,
         }
 
-        self.integration = filter(
+        self.integration = list(filter(
             lambda i: i['service']['id'] == self.service_id,
             self.integration_data,
-        )[0]
+        ))[0]
 
         self.integration_id = self.integration['id']
 

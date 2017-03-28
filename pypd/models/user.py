@@ -24,7 +24,7 @@ class User(Entity):
         if from_email is not None:
             add_headers['From'] = from_email
 
-        return getattr(Entity, 'create').im_func(
+        return getattr(Entity, 'create').__func__(
             cls,
             data=data,
             api_key=api_key,

@@ -45,8 +45,8 @@ class Integration(Entity):
             sid = service['id'] if isinstance(service, Entity) else service
             endpoint = 'services/{0}/integrations'.format(sid)
 
-        return getattr(Entity, 'fetch').im_func(cls, id, endpoint=endpoint,
-                                                *args, **kwargs)
+        return getattr(Entity, 'fetch').__func__(cls, id, endpoint=endpoint,
+                                                 *args, **kwargs)
 
     @classmethod
     def delete(*args, **kwargs):
@@ -76,5 +76,5 @@ class Integration(Entity):
             endpoint = 'services/{0}/integrations'.format(sid)
 
         # otherwise endpoint should contain the service path too
-        getattr(Entity, 'create').im_func(cls, endpoint=endpoint, data=data,
+        getattr(Entity, 'create').__func__(cls, endpoint=endpoint, data=data,
                                           *args, **kwargs)
