@@ -35,4 +35,4 @@ class Vendor(Entity):
         """Validate and then create a Vendor entity."""
         cls.validate(data)
         # otherwise endpoint should contain the service path too
-        getattr(Entity, 'create').im_func(cls, data=data, *args, **kwargs)
+        getattr(Entity, 'create').__func__(cls, data=data, *args, **kwargs)
