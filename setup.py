@@ -12,7 +12,7 @@ options = {
     'description': 'A python client for PagerDuty API',
     'author': 'JD Cumpson',
     'author_email': 'jdc@pagerduty.com',
-    'maintainer': 'jdc@pagerduty.com',
+    'maintainer': 'JD Cumpson',
     'maintainer_email': 'jdc@pagerduty.com',
     'license': 'MIT',
     'url': 'https://github.com/PagerDuty/pagerduty-api-python-client',
