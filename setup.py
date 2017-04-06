@@ -12,10 +12,11 @@ options = {
     'description': 'A python client for PagerDuty API',
     'author': 'JD Cumpson',
     'author_email': 'jdc@pagerduty.com',
+    'maintainer': 'jdc@pagerduty.com',
     'maintainer_email': 'jdc@pagerduty.com',
     'license': 'MIT',
-    'url': 'https://github.com/PagerDuty/pypd',
-    'download_url': 'https://github.com/PagerDuty/pypd/archive/master.tar.gz',
+    'url': 'https://github.com/PagerDuty/pagerduty-api-python-client',
+    'download_url': 'https://github.com/PagerDuty/pagerduty-api-python-client/archive/master.tar.gz',
     'classifiers': [
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',

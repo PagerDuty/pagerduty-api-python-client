@@ -2,3 +2,8 @@ pypd.egg-info/
 *.pyc
 .DS_Store
 api.key
+.tox/
+build/
+lib/
+bin/
+dist/
