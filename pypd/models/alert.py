@@ -9,21 +9,18 @@ from .entity import Entity
 
 
 class Alert(Entity):
-    def resolve(self, incident=None, from_email=None):
+    def resolve(self, from_email=None):
         """Resolve an alert using a valid email address."""
         if from_email is None:
             raise Exception('%s.resolve requires \'from_email\' argument.')
 
-        if incident is None and endpoint is None:
-            raise InvalidArguments(incident, endpoint)
-
-        iid = incident['id'] if isinstance(incident, Entity) else incident
-        endpoint = 'incidents/{0}/alerts/{1}'.format(iid, self['id'])
+        parent_incident_id = self['incident']['id']
+        endpoint = 'incidents/{0}/alerts/{1}'.format(parent_incident_id, self['id'])
 
         add_headers = {'from': from_email, }
         data = {
             'alert': {
-                'id': iid,
+                'id': self['id'],
                 'type': 'alert',
                 'status': 'resolved',
             }
@@ -35,32 +32,30 @@ class Alert(Entity):
                               data=data,)
         return result
 
-    def associate(self, incident=None, new_parent=None, from_email=None,):
+    def associate(self, new_parent_incident=None, from_email=None,):
         """Associate an alert with an incident using a valid email address."""
         if from_email is None:
             raise Exception('%s.associate requires \'from_email\' argument.')
 
-        if new_parent is None:
-            raise Exception('%s.associate requires \'new_parent\' argument.')
+        if new_parent_incident is None:
+            raise Exception('%s.associate requires \'new_parent_incident\' argument.')
 
-        iid = incident['id'] if isinstance(incident, Entity) else incident
-        endpoint = 'incidents/{0}/alerts/{1}'.format(iid, self['id'])
+        parent_incident_id = self['incident']['id']
+        endpoint = 'incidents/{0}/alerts/{1}'.format(parent_incident_id, self['id'])
 
-        new_parent_id = new_parent['id'] if isinstance(new_parent, Entity) else new_parent
+        new_parent_incident_id = new_parent_incident['id'] if isinstance(new_parent_incident, Entity) else new_parent_incident
 
         add_headers = {'from': from_email, }
         data = {
             'alert': {
-                'id': iid,
+                'id': self['id'],
                 'type': 'alert',
                 'incident': {
                     'type': 'incident',
-                    'id': new_parent_id,
+                    'id': new_parent_incident_id,
                 }
             }
         }
-
-        print data
 
         result = self.request('PUT',
                               endpoint=endpoint,
