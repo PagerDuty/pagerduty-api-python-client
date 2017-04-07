@@ -8,11 +8,13 @@ except ImportError:
 from .entity import Entity
 from .log_entry import LogEntry
 from .note import Note
+from .alert import Alert
 
 
 class Incident(Entity):
     logEntryFactory = LogEntry
     noteFactory = Note
+    alertFactory = Alert
 
     def resolve(self, from_email=None, resolution=None,):
         """Resolve an incident using a valid email address."""
@@ -109,4 +111,12 @@ class Incident(Entity):
             endpoint=endpoint,
             api_key=self.api_key,
             data={'duration': duration},
+        )
+
+    def alerts(self):
+        """Query for alerts attached to this incident."""
+        endpoint = '/'.join((self.endpoint, self.id, 'alerts'))
+        return self.alertFactory.find(
+            endpoint=endpoint,
+            api_key=self.api_key,
         )
