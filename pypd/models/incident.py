@@ -113,6 +113,31 @@ class Incident(Entity):
             data={'duration': duration},
         )
 
+    def merge(self, source_incidents, from_email=None,):
+        """Merge incidents into this incident."""
+        if from_email is None:
+            raise Exception('%s.merge requires \'from_email\' argument.')
+
+        add_headers = {'from': from_email, }
+
+        endpoint = '/'.join((self.endpoint, self.id, 'merge'))
+
+        transform_incident_to_id = lambda x: x['id'] if isinstance(x, Entity) else x
+        source_incidents_ids = list(map(transform_incident_to_id, source_incidents))
+
+        transform_incident_ids_to_api_object = lambda x: { 'type': 'incident_reference', 'id': x }
+        source_incidents_object = list(map(transform_incident_ids_to_api_object, source_incidents_ids))
+
+        data = {
+            'source_incidents': source_incidents_object
+        }
+
+        result = self.request('PUT',
+                              endpoint=endpoint,
+                              add_headers=add_headers,
+                              data=data,)
+        return result
+
     def alerts(self):
         """Query for alerts attached to this incident."""
         endpoint = '/'.join((self.endpoint, self.id, 'alerts'))
