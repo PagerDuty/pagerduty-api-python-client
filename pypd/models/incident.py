@@ -9,6 +9,7 @@ from .entity import Entity
 from .log_entry import LogEntry
 from .note import Note
 from .alert import Alert
+from ..errors import InvalidArguments
 
 
 class Incident(Entity):
@@ -116,7 +117,7 @@ class Incident(Entity):
     def merge(self, source_incidents, from_email=None,):
         """Merge incidents into this incident."""
         if from_email is None:
-            raise Exception('%s.merge requires \'from_email\' argument.')
+            raise InvalidArguments(from_email)
 
         add_headers = {'from': from_email, }
 

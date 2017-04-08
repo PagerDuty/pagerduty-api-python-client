@@ -6,13 +6,14 @@ except ImportError:
     import json
 
 from .entity import Entity
+from ..errors import InvalidArguments
 
 
 class Alert(Entity):
     def resolve(self, from_email=None):
         """Resolve an alert using a valid email address."""
         if from_email is None:
-            raise Exception('%s.resolve requires \'from_email\' argument.')
+            raise InvalidArguments(from_email)
 
         parent_incident_id = self['incident']['id']
         endpoint = 'incidents/{0}/alerts/{1}'.format(parent_incident_id, self['id'])
@@ -35,10 +36,10 @@ class Alert(Entity):
     def associate(self, new_parent_incident=None, from_email=None,):
         """Associate an alert with an incident using a valid email address."""
         if from_email is None:
-            raise Exception('%s.associate requires \'from_email\' argument.')
+            raise InvalidArguments(from_email)
 
         if new_parent_incident is None:
-            raise Exception('%s.associate requires \'new_parent_incident\' argument.')
+            raise InvalidArguments(new_parent_incident)
 
         parent_incident_id = self['incident']['id']
         endpoint = 'incidents/{0}/alerts/{1}'.format(parent_incident_id, self['id'])
