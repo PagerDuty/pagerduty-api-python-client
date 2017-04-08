@@ -126,12 +126,10 @@ class Incident(Entity):
         transform_incident_to_id = lambda x: x['id'] if isinstance(x, Entity) else x
         source_incidents_ids = list(map(transform_incident_to_id, source_incidents))
 
-        transform_incident_ids_to_api_object = lambda x: { 'type': 'incident_reference', 'id': x }
+        transform_incident_ids_to_api_object = lambda x: {'type': 'incident_reference', 'id': x, }
         source_incidents_object = list(map(transform_incident_ids_to_api_object, source_incidents_ids))
 
-        data = {
-            'source_incidents': source_incidents_object
-        }
+        data = {'source_incidents': source_incidents_object, }
 
         result = self.request('PUT',
                               endpoint=endpoint,

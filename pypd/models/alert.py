@@ -44,7 +44,10 @@ class Alert(Entity):
         parent_incident_id = self['incident']['id']
         endpoint = 'incidents/{0}/alerts/{1}'.format(parent_incident_id, self['id'])
 
-        new_parent_incident_id = new_parent_incident['id'] if isinstance(new_parent_incident, Entity) else new_parent_incident
+        if isinstance(new_parent_incident, Entity):
+            new_parent_incident_id = new_parent_incident['id']
+        else:
+            new_parent_incident_id = new_parent_incident
 
         add_headers = {'from': from_email, }
         data = {
