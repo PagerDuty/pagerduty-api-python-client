@@ -10,6 +10,19 @@ from ..errors import InvalidArguments
 
 
 class Alert(Entity):
+    @classmethod
+    def fetch(cls, id, incident=None, endpoint=None, *args, **kwargs):
+        """Customize fetch because this is a nested resource."""
+        if incident is None and endpoint is None:
+            raise InvalidArguments(incident, endpoint)
+
+        if endpoint is None:
+            iid = incident['id'] if isinstance(incident, Entity) else incident
+            endpoint = 'incidents/{0}/alerts'.format(iid)
+
+        return getattr(Entity, 'fetch').__func__(cls, id, endpoint=endpoint,
+                                                 *args, **kwargs)
+
     def resolve(self, from_email=None):
         """Resolve an alert using a valid email address."""
         if from_email is None:
