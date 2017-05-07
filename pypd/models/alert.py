@@ -29,7 +29,8 @@ class Alert(Entity):
             raise InvalidArguments(from_email)
 
         parent_incident_id = self['incident']['id']
-        endpoint = 'incidents/{0}/alerts/{1}'.format(parent_incident_id, self['id'])
+        endpoint_format = 'incidents/{0}/alerts/{1}'
+        endpoint = endpoint_format.format(parent_incident_id, self['id'])
 
         add_headers = {'from': from_email, }
         data = {
@@ -55,7 +56,8 @@ class Alert(Entity):
             raise InvalidArguments(new_parent_incident)
 
         parent_incident_id = self['incident']['id']
-        endpoint = 'incidents/{0}/alerts/{1}'.format(parent_incident_id, self['id'])
+        endpoint_format = 'incidents/{0}/alerts/{1}'
+        endpoint = endpoint_format.format(parent_incident_id, self['id'])
 
         if isinstance(new_parent_incident, Entity):
             new_parent_incident_id = new_parent_incident['id']

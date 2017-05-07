@@ -114,6 +114,12 @@ class Incident(Entity):
             data={'duration': duration},
         )
 
+    def _extract_entity_id(incident):
+        return x['id'] if isinstance(x, Entity) else x
+
+    def _incident_to_object(incident_id):
+        return {'type': 'incident_reference', 'id': incident_id, }
+
     def merge(self, source_incidents, from_email=None,):
         """Merge incidents into this incident."""
         if from_email is None:
@@ -123,13 +129,11 @@ class Incident(Entity):
 
         endpoint = '/'.join((self.endpoint, self.id, 'merge'))
 
-        transform_incident_to_id = lambda x: x['id'] if isinstance(x, Entity) else x
-        source_incidents_ids = list(map(transform_incident_to_id, source_incidents))
+        source_ids = list(map(_extract_entity_id, source_incidents))
 
-        transform_incident_ids_to_api_object = lambda x: {'type': 'incident_reference', 'id': x, }
-        source_incidents_object = list(map(transform_incident_ids_to_api_object, source_incidents_ids))
+        source_object = list(map(_incident_to_object, source_ids))
 
-        data = {'source_incidents': source_incidents_object, }
+        data = {'source_incidents': source_object, }
 
         result = self.request('PUT',
                               endpoint=endpoint,
