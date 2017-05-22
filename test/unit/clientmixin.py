@@ -83,5 +83,15 @@ class ClientMixinTestCase(unittest.TestCase):
             headers=''
         )
 
+    def test_statuses_array(self, m):
+        method = 'GET'
+        body = {'status': 'OK'}
+        url = '%s?statuses[]=triggered&statuses[]=acknowledged' % self.url
+        m.register_uri(method, url, json=body)
+        result = self.requester.request(method, self.endpoint,
+                                        query_params={'statuses': ['triggered',
+                                                                   'acknowledged']})
+        self.assertEqual(body, result)
+
 if __name__ == '__main__':
     unittest.main()
