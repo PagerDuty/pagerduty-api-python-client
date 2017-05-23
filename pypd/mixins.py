@@ -92,7 +92,7 @@ class ClientMixin(object):
         if add_headers is not None:
             headers.update(**add_headers)
 
-        for k, v in query_params.items():
+        for k, v in query_params.copy().items():
             if isinstance(v, stringtype):
                 continue
             elif isinstance(v, Number):
