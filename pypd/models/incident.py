@@ -106,7 +106,7 @@ class Incident(Entity):
             endpoint=endpoint,
             api_key=self.api_key,
             add_headers=add_headers,
-            data={'note': {'content': content}},
+            data={'content': content},
         )
 
     def snooze(self, from_email, duration):
@@ -121,5 +121,6 @@ class Incident(Entity):
             endpoint=endpoint,
             api_key=self.api_key,
             add_headers=add_headers,
-            data={'duration': duration, },
+            data_key='duration',
+            data=3600,
         )
