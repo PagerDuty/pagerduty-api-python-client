@@ -69,8 +69,9 @@ class ClientMixin(object):
 
         Need to be able to inject Mocked response objects here.
         """
-        log('Doing HTTP request: {0} with headers: {1}'.format(
-            args[0], kwargs.get('headers')), level=logging.DEBUG)
+        log('Doing HTTP [{3}] request: {0} - headers: {1} - payload: {2}'.format(
+            args[0], kwargs.get('headers'), kwargs.get('data'), method,),
+            level=logging.DEBUG,)
         requests_method = getattr(requests, method)
         return self._handle_response(requests_method(*args, **kwargs))
 

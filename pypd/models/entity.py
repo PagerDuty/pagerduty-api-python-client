@@ -438,7 +438,7 @@ class Entity(ClientMixin):
 
     @classmethod
     def create(cls, data=None, api_key=None, endpoint=None, add_headers=None,
-               **kwargs):
+               data_key=None, response_data_key=None, **kwargs):
         """
         Create an instance of the Entity model by calling to the API endpoint.
 
@@ -449,9 +449,15 @@ class Entity(ClientMixin):
         the entire entity value. A True or False response is no bueno.
         """
         inst = cls(api_key=api_key)
-        entity_endpoint = cls.sanitize_ep(cls.get_endpoint())
+
+        if data_key is None:
+            data_key = cls.sanitize_ep(cls.get_endpoint())
+
+        if response_data_key is None:
+            response_data_key = cls.sanitize_ep(cls.get_endpoint())
+
         body = {}
-        body[entity_endpoint] = data
+        body[data_key] = data
 
         if endpoint is None:
             endpoint = cls.get_endpoint()
@@ -462,7 +468,7 @@ class Entity(ClientMixin):
                                           query_params=kwargs,
                                           add_headers=add_headers,
                                           ),
-                             key=entity_endpoint))
+                             key=response_data_key))
         return inst
 
     # sugar-pills

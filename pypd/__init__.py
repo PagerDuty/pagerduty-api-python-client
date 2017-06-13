@@ -23,3 +23,11 @@ from .models.vendor import Vendor
 
 api_key = None
 base_url = 'https://api.pagerduty.com'
+
+
+def set_api_key_from_file(path, set_global=True):
+    """Set the global api_key from a file path."""
+    with open(path, 'r+b') as f:
+        global api_key
+        api_key = f.read().strip()
+    return api_key

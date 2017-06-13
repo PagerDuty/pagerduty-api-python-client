@@ -25,7 +25,7 @@ printsep()
 
 policy = pypd.EscalationPolicy.fetch(policies[0].id)
 print(policy)
-print(policy.json())
+print(policy.json)
 printsep()
 
 incidents = pypd.Incident.find()
@@ -34,5 +34,5 @@ printsep()
 
 incident = pypd.Incident.fetch(incidents[0].id)
 print(incident)
-print(incident.json())
+print(incident.json)
 printsep()
