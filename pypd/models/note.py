@@ -36,5 +36,9 @@ class Note(Entity):
             endpoint = 'incidents/{0}/notes'.format(iid)
 
         # otherwise endpoint should contain the incident path too
-        getattr(Entity, 'create').__func__(cls, endpoint=endpoint, *args,
-                                          **kwargs)
+        return getattr(Entity, 'create').__func__(
+            cls,
+            endpoint=endpoint,
+            *args,
+            **kwargs
+        )

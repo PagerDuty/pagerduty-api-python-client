@@ -8,19 +8,20 @@ except ImportError:
 from .entity import Entity
 from .log_entry import LogEntry
 from .note import Note
+from ..errors import MissingFromEmail
 
 
 class Incident(Entity):
     logEntryFactory = LogEntry
     noteFactory = Note
 
-    def resolve(self, from_email=None, resolution=None,):
+    def resolve(self, from_email, resolution=None):
         """Resolve an incident using a valid email address."""
+
+        if from_email is None or not isinstance(from_email, basestring):
+            raise MissingFromEmail(from_email)
+
         endpoint = '/'.join((self.endpoint, self.id,))
-
-        if from_email is None:
-            raise Exception('%s.resolve requires \'from_email\' argument.')
-
         add_headers = {'from': from_email, }
         data = {
             'incident': {
@@ -38,12 +39,12 @@ class Incident(Entity):
                               data=data,)
         return result
 
-    def acknowledge(self, from_email,):
+    def acknowledge(self, from_email):
         """Resolve an incident using a valid email address."""
         endpoint = '/'.join((self.endpoint, self.id,))
 
-        if from_email is None:
-            raise Exception('%s.acknowledge requires \'from_email\' argument.')
+        if from_email is None or not isinstance(from_email, basestring):
+            raise MissingFromEmail(from_email)
 
         add_headers = {'from': from_email, }
         data = {
@@ -93,20 +94,32 @@ class Incident(Entity):
             api_key=self.api_key,
         )
 
-    def create_note(self, content):
+    def create_note(self, from_email, content):
         """Create a note for this incident."""
+        if from_email is None or not isinstance(from_email, basestring):
+            raise MissingFromEmail(from_email)
+
         endpoint = '/'.join((self.endpoint, self.id, 'notes'))
+        add_headers = {'from': from_email, }
+
         return self.noteFactory.create(
             endpoint=endpoint,
             api_key=self.api_key,
+            add_headers=add_headers,
             data={'note': {'content': content}},
         )
 
-    def snooze(self, duration):
+    def snooze(self, from_email, duration):
         """Snooze this incident for `duration` seconds."""
+        if from_email is None or not isinstance(from_email, basestring):
+            raise MissingFromEmail(from_email)
+
         endpoint = '/'.join((self.endpoint, self.id, 'snooze'))
-        return self.noteFactory.create(
+        add_headers = {'from': from_email, }
+
+        return self.__class__.create(
             endpoint=endpoint,
             api_key=self.api_key,
-            data={'duration': duration},
+            add_headers=add_headers,
+            data={'duration': duration, },
         )

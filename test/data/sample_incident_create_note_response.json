@@ -1,0 +1,14 @@
+{
+  "note": {
+    "id": "PWL7QXS",
+    "user": {
+      "id": "PXPGF42",
+      "type": "user_reference",
+      "summary": "Earline Greenholt",
+      "self": "https://api.pagerduty.com/users/PXPGF42",
+      "html_url": "https://subdomain.pagerduty.com/users/PXPGF42"
+    },
+    "content": "Firefighters are on the scene.",
+    "created_at": "2013-03-06T15:28:51-05:00"
+  }
+}

@@ -65,13 +65,40 @@ class InvalidResponse(Error):
         return 'InvalidResponse: {0}'.format(self.data)
 
 
-class InvalidArguments(Exception):
+class InvalidArguments(Error):
     """A function was passed invalid arguments."""
 
+    def __init__(self, *args):
+        """Initialize the exception."""
+        self.code = 400
+        self.args = args
+        Error.__init__(self)
 
-class InvalidEndpoint(Exception):
+    def __str__(self):
+        """Return a stringified error."""
+        error = '{0} ({1}): {2}'.format(self.__class__.__name__, self.code,
+                                        self.args)
+        return error
+
+
+class InvalidEndpoint(Error):
     """An endpoint was accessed that is not a valid API endpoint."""
 
 
-class InvalidEndpointOperation(Exception):
+class InvalidEndpointOperation(Error):
     """An invalid operation on this endpoint was accessed."""
+
+
+class MissingFromEmail(Error):
+    """A function was called with missing from email header."""
+
+    def __init__(self, from_email):
+        """Initialize the exception with 400 status."""
+        self.code = 400
+        self.from_email = from_email
+        Error.__init__(self)
+
+    def __str__(self):
+        """Return a stringified error."""
+        return '{0} ({1}): Requires \'from_email\' to be valid, got {2}'\
+            .format(self.__class__.__name__, self.code, self.from_email,)
