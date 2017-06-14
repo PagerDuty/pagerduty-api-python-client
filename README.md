@@ -1,6 +1,12 @@
 # pypd - PagerDuty Python API Client
 A client in Python for PagerDuty's v2 API.
 
+#### This is a community supported repository
+This repository is not an offical product of PagerDuty but aims to be an
+effective tool for developers to use the PagerDuty API. If you have concerns
+or issues you are welcome to bring them up as an issue on the repository, or
+we would be even happier to accept your pull requests! Happy coding :)
+
 Now available on PyPI https://pypi.python.org/pypi/pypd
 
 ## How Do
