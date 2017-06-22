@@ -92,7 +92,6 @@ class AlertTestCase(unittest.TestCase):
     def mock_put_request(self, m, url, payload):
         self.mock_request(m, 'PUT', url, payload)
 
-    # Tests
     @requests_mock.Mocker()
     def test_fetch_all_alerts_from_incident(self, m):
         incident_url = self.build_incident_url(self.first_incident_id)
