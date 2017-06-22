@@ -7,14 +7,10 @@ import os.path
 import requests_mock
 
 from pypd import Incident, Alert
-from pypd.errors import InvalidArguments
 
 
 def get_object_by_id(data, search_id):
-    return list(filter(
-        lambda s: s['id'] == search_id,
-        data,
-    ))[0]
+    return list(filter(lambda s: s['id'] == search_id, data))[0]
 
 
 def get_data(data_type, mock_object):
@@ -29,7 +25,8 @@ class AlertTestCase(unittest.TestCase):
         self.limit = 25
         base_path = os.path.join(
             os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-            'data')
+            'data'
+        )
         path = os.path.join(base_path, 'sample_incidents.json')
         with open(path) as f:
             self.incidents_data = json.load(f)
@@ -40,17 +37,23 @@ class AlertTestCase(unittest.TestCase):
 
         self.first_incident_id = 'INCIDENT1'
         self.first_incident = get_object_by_id(
-            self.incidents_data, self.first_incident_id)
+            self.incidents_data,
+            self.first_incident_id
+        )
         self.first_incident_data = get_data('incident', self.first_incident)
 
         self.second_incident_id = 'INCIDENT2'
         self.second_incident = get_object_by_id(
-            self.incidents_data, self.second_incident_id)
+            self.incidents_data,
+            self.second_incident_id
+        )
         self.second_incident_data = get_data('incident', self.second_incident)
 
         self.first_alert_id = 'ALERT1'
         self.first_alert = get_object_by_id(
-            self.alerts_data, self.first_alert_id)
+            self.alerts_data,
+            self.first_alert_id
+        )
         self.first_alert_data = get_data('alert', self.first_alert)
 
         self.second_alert_id = 'ALERT2'
@@ -58,7 +61,7 @@ class AlertTestCase(unittest.TestCase):
             self.alerts_data, self.second_alert_id)
         self.second_alert_data = get_data('alert', self.second_alert)
 
-    # Test helpers
+    # test helpers
     def build_incident_url(self, incident_id):
         return '{0}/incidents/{1}'.format(
             self.base_url,
@@ -99,7 +102,10 @@ class AlertTestCase(unittest.TestCase):
 
         alerts_url = self.build_incident_alerts_url(self.first_incident_id)
         self.mock_get_request(
-            m, alerts_url, {'alerts': [self.first_alert, self.second_alert, ]})
+            m,
+            alerts_url,
+            {'alerts': [self.first_alert, self.second_alert, ]}
+        )
 
         incident = Incident.fetch(self.first_incident_id, api_key=self.api_key)
         alerts = incident.alerts()
@@ -114,19 +120,28 @@ class AlertTestCase(unittest.TestCase):
         self.mock_get_request(m, incident_url, self.first_incident_data)
 
         incident_alerts_url = self.build_incident_alerts_url(
-            self.first_incident_id)
+            self.first_incident_id
+        )
         self.mock_get_request(
-            m, incident_alerts_url,
-            {'alerts': [self.first_alert, self.second_alert, ]})
+            m,
+            incident_alerts_url,
+            {'alerts': [self.first_alert, self.second_alert, ]}
+        )
 
         alert_url = self.build_alert_url(
-            self.first_incident_id, self.first_alert_id)
+            self.first_incident_id,
+            self.first_alert_id
+        )
         self.mock_get_request(m, alert_url, self.first_alert_data)
 
         incident = Incident.fetch(self.first_incident_id, api_key=self.api_key)
         alerts = incident.alerts()
         alert = Alert.fetch(
-            self.first_alert_id, incident, None, api_key=self.api_key)
+            self.first_alert_id,
+            incident,
+            None,
+            api_key=self.api_key
+        )
 
         incident_alert_ids = [i.id for i in alerts]
         self.assertIn(alert.id, incident_alert_ids)
@@ -137,13 +152,19 @@ class AlertTestCase(unittest.TestCase):
         self.mock_get_request(m, incident_url, self.first_incident_data)
 
         alert_url = self.build_alert_url(
-            self.first_incident_id, self.first_alert_id)
+            self.first_incident_id,
+            self.first_alert_id
+        )
         self.mock_get_request(m, alert_url, self.first_alert_data)
         self.mock_put_request(m, alert_url, self.first_alert_data)
 
         incident = Incident.fetch(self.first_incident_id, api_key=self.api_key)
         alert = Alert.fetch(
-            self.first_alert_id, incident, None, api_key=self.api_key)
+            self.first_alert_id,
+            incident,
+            None,
+            api_key=self.api_key
+        )
         alert.resolve('nizar@pagerduty.com')
 
         last_request_json = m.last_request.json()
@@ -158,18 +179,29 @@ class AlertTestCase(unittest.TestCase):
 
         second_incident_url = self.build_incident_url(self.second_incident_id)
         self.mock_get_request(
-            m, second_incident_url, self.second_incident_data)
+            m,
+            second_incident_url,
+            self.second_incident_data
+        )
 
         alert_url = self.build_alert_url(
-            self.first_incident_id, self.first_alert_id)
+            self.first_incident_id,
+            self.first_alert_id
+        )
         self.mock_get_request(m, alert_url, self.first_alert_data)
         self.mock_put_request(m, alert_url, self.first_alert_data)
 
         incident = Incident.fetch(self.first_incident_id, api_key=self.api_key)
         new_incident = Incident.fetch(
-            self.second_incident_id, api_key=self.api_key)
+            self.second_incident_id,
+            api_key=self.api_key
+        )
         alert = Alert.fetch(
-            self.first_alert_id, incident, None, api_key=self.api_key)
+            self.first_alert_id,
+            incident,
+            None,
+            api_key=self.api_key
+        )
         alert.associate(new_incident, 'nizar@pagerduty.com')
 
         last_request_json = m.last_request.json()
@@ -177,7 +209,8 @@ class AlertTestCase(unittest.TestCase):
         self.assertEqual(self.first_alert_id, last_request_json['alert']['id'])
         self.assertEqual(
             self.second_incident_id,
-            last_request_json['alert']['incident']['id'])
+            last_request_json['alert']['incident']['id']
+        )
 
 if __name__ == "__main__":
     unittest.main()

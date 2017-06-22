@@ -139,12 +139,15 @@ class Incident(Entity):
                         for entity in source_incidents]
         incident_references = [{'type': 'incident_reference', 'id': id_}
                                for id_ in incident_ids]
-        data = {'source_incidents': incident_references, }
-        result = self.request('PUT',
-                              endpoint=endpoint,
-                              add_headers=add_headers,
-                              data=data,)
-        return result
+
+        return self.__class__.create(
+            endpoint=endpoint,
+            api_key=self.api_key,
+            add_headers=add_headers,
+            data_key='source_incidents',
+            data=incident_references,
+            method='PUT',
+        )
 
     def alerts(self):
         """Query for alerts attached to this incident."""
