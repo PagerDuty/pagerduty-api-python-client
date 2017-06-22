@@ -1,0 +1,86 @@
+[
+    {
+        "alert_key": "second",
+        "created_at": "2017-04-06T23:41:08-04:00",
+        "first_trigger_log_entry":
+        {
+            "html_url": "https://fake.pagerduty.com/alerts/ALERT1/log_entries/ALOGENTRY1",
+            "id": "ALOGENTRY1",
+            "self": "https://api.pagerduty.com/log_entries/ALOGENTRY1",
+            "summary": "Triggered through the API",
+            "type": "trigger_log_entry_reference"
+        },
+        "html_url": "https://fake.pagerduty.com/alerts/ALERT1",
+        "id": "ALERT1",
+        "incident":
+        {
+            "html_url": "https://fake.pagerduty.com/incidents/INCIDENT1",
+            "id": "INCIDENT1",
+            "self": "https://api.pagerduty.com/incidents/INCIDENT1",
+            "summary": "[#1] this is a trigger event!",
+            "type": "incident_reference"
+        },
+        "integration":
+        {
+            "html_url": "https://fake.pagerduty.com/services/SERVICE1/integrations/INTEGRATION1",
+            "id": "SERVICE1",
+            "self": "https://api.pagerduty.com/services/SERVICE1/integrations/INTEGRATION1",
+            "summary": "API Alert",
+            "type": "generic_events_api_inbound_integration_reference"
+        },
+        "self": "https://api.pagerduty.com/alerts/ALERT1",
+        "service":
+        {
+            "html_url": "https://fake.pagerduty.com/services/SERVICE1",
+            "id": "SERVICE1",
+            "self": "https://api.pagerduty.com/services/SERVICE1",
+            "summary": "Alert and Incidents",
+            "type": "service_reference"
+        },
+        "status": "resolved",
+        "summary": "this is a trigger event!",
+        "type": "alert"
+    },
+    {
+        "alert_key": "second",
+        "created_at": "2017-04-06T23:41:07-04:00",
+        "first_trigger_log_entry":
+        {
+            "html_url": "https://fake.pagerduty.com/alerts/ALERT2/log_entries/ALOGENTRY2",
+            "id": "ALOGENTRY2",
+            "self": "https://api.pagerduty.com/log_entries/ALOGENTRY2",
+            "summary": "Triggered through the API",
+            "type": "trigger_log_entry_reference"
+        },
+        "html_url": "https://fake.pagerduty.com/alerts/ALERT2",
+        "id": "ALERT2",
+        "incident":
+        {
+            "html_url": "https://fake.pagerduty.com/incidents/INCIDENT1",
+            "id": "INCIDENT1",
+            "self": "https://api.pagerduty.com/incidents/INCIDENT1",
+            "summary": "[#1] this is a trigger event!",
+            "type": "incident_reference"
+        },
+        "integration":
+        {
+            "html_url": "https://fake.pagerduty.com/services/SERVICE1/integrations/INTEGRATION1",
+            "id": "INTEGRATION1",
+            "self": "https://api.pagerduty.com/services/SERVICE1/integrations/INTEGRATION1",
+            "summary": "API Alert",
+            "type": "generic_events_api_inbound_integration_reference"
+        },
+        "self": "https://api.pagerduty.com/alerts/ALERT2",
+        "service":
+        {
+            "html_url": "https://fake.pagerduty.com/services/SERVICE1",
+            "id": "SERVICE1",
+            "self": "https://api.pagerduty.com/services/SERVICE1",
+            "summary": "Alert and Incidents",
+            "type": "service_reference"
+        },
+        "status": "resolved",
+        "summary": "this is a trigger event!",
+        "type": "alert"
+    }
+]
