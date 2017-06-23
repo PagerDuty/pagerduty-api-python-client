@@ -1,12 +1,13 @@
 # Copyright (c) PagerDuty.
 # See LICENSE for details.
+
 try:
     import ujson as json
 except ImportError:
     import json
 
 from .entity import Entity
-from ..errors import InvalidArguments
+from ..errors import InvalidArguments, MissingFromEmail
 
 
 class Alert(Entity):
@@ -23,10 +24,10 @@ class Alert(Entity):
         return getattr(Entity, 'fetch').__func__(cls, id, endpoint=endpoint,
                                                  *args, **kwargs)
 
-    def resolve(self, from_email=None):
+    def resolve(self, from_email):
         """Resolve an alert using a valid email address."""
-        if from_email is None:
-            raise InvalidArguments(from_email)
+        if from_email is None or not isinstance(from_email, basestring):
+            raise MissingFromEmail(from_email)
 
         parent_incident_id = self['incident']['id']
         endpoint_format = 'incidents/{0}/alerts/{1}'
@@ -47,10 +48,10 @@ class Alert(Entity):
                               data=data,)
         return result
 
-    def associate(self, new_parent_incident=None, from_email=None,):
+    def associate(self, from_email, new_parent_incident=None):
         """Associate an alert with an incident using a valid email address."""
-        if from_email is None:
-            raise InvalidArguments(from_email)
+        if from_email is None or not isinstance(from_email, basestring):
+            raise MissingFromEmail(from_email)
 
         if new_parent_incident is None:
             raise InvalidArguments(new_parent_incident)

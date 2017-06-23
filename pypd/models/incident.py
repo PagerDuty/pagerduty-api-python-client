@@ -15,6 +15,8 @@ from ..errors import MissingFromEmail
 class Incident(Entity):
     """Represents an Incident in PagerDuty's API."""
 
+    STR_OUTPUT_FIELDS = ('id', 'status',)
+
     logEntryFactory = LogEntry
     noteFactory = Note
     alertFactory = Alert

@@ -202,7 +202,8 @@ class AlertTestCase(unittest.TestCase):
             None,
             api_key=self.api_key
         )
-        alert.associate(new_incident, 'nizar@pagerduty.com')
+
+        alert.associate('nizar@pagerduty.com', new_incident)
 
         last_request_json = m.last_request.json()
         self.assertEqual('PUT', m.last_request.method)

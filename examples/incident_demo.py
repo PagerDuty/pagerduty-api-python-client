@@ -2,10 +2,14 @@
 from __future__ import print_function
 from os.path import dirname, join
 import logging
+from time import sleep
+
+from pprint import pprint
 
 import pypd
 from pypd.errors import BadRequest
 
+# turn logging on debug so we can see details about HTTP requests
 logging.basicConfig(level=logging.DEBUG)
 
 
@@ -65,10 +69,55 @@ except BadRequest:
     to_merge = pypd.Incident.find(incident_key=mergable_key)[-1]
 
 # ack it, snooze it, resolve it... bop it?
-print(incident)
-print(incident.json)
+pprint(incident)
+pprint(incident.json)
 incident.acknowledge(from_email)
 incident.snooze(from_email, duration=3600)
 incident.create_note(from_email, 'This is a note!')
 incident.merge(from_email, [to_merge, ])
+
+# before we trigger an event get all currently triggered incidents
+triggered_incidents = pypd.Incident.find(statuses=['triggered', ])
+
+# let's see if events and alerts work!
+pypd.EventV2.create(data={
+    'routing_key': '64e61052453e4ec0a3b42e93ac235375',
+    'event_action': 'trigger',
+    'payload': {
+        'summary': 'this is an error event!',
+        'severity': 'error',
+        'source': 'pypd bot',
+    }
+})
+
+# wait for our events to trigger incidents
+while True:
+    incidents = pypd.Incident.find(statuses=['triggered', ])
+    if len(incidents) > len(triggered_incidents):
+        break
+    pprint('Sleeping for 1 second...')
+    sleep(1)
+
+# find the new incidents because they will have alerts since they were event
+# generated
+triggered_ids = [i['id'] for i in triggered_incidents]
+incident_ids = [i['id'] for i in incidents]
+new_ids = set(triggered_ids).union(set(incident_ids))
+new_incidents = filter(lambda i: i['id'] in new_ids, incidents)
+new_incident = new_incidents[0]
+alerts = new_incident.alerts()
+
+# try some alert actions
+alert = alerts[0]
+pprint(alert.json)
+pprint(alert.resolve(from_email))
+
+
+for i in incidents:
+    # skip the one we resolved earlier because it will only have 1 alert
+    if i['id'] == new_incident['id']:
+        continue
+    i.resolve(from_email=from_email, resolution='resolved automagically!')
+
+# resolve and finish up
 incident.resolve(from_email, resolution='resolved automatically!')
