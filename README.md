@@ -30,6 +30,13 @@ print ep._data  # raw data, best not to access it this way!
 # nice embedded property things
 incident = pypd.Incident.find_one()
 log_entries = incident.log_entries()
+alerts = incident.alerts()
+
+# incident actions
+incident.snooze(from_email='jdc@pagerduty.com', 3600) # snooze for an hour
+incident.resolve(from_email='jdc@pagerduty.com', resolution='We solved a thing')
+incident.merge(from_email='jdc@pagerduty.com', [another_incident, ])
+incident.create_note(from_email='jdc@pagerduty.com', 'Dually noted.')
 
 # find users
 user = pypd.User.find_one(email="jdc@pagerduty.com")
@@ -47,7 +54,20 @@ pypd.Event.create(data={
           },
     ],
 })
+
+# create a version 2 event
+pypd.EventV2.create(data={
+    'routing_key': 'YOUR_INTEGRATION_KEY',
+    'event_action': 'trigger',
+    'payload': {
+        'summary': 'this is an error event!',
+        'severity': 'error',
+        'source': 'pypd bot',
+    }
+})
 ```
+
+If you need more examples head to [incident_demo.py](./examples/incident_demo.py).
 
 ## Notes
 All models **should** be complete CR-D complete, with the missing *update* method. Soon to be fixed.
@@ -73,7 +93,10 @@ tox
 
 ## Links
 
-Do you develop **twisted** applications? An asynchronous port of this library for [Twisted](http://twistedmatrix.com) exists [txpypd](https://github.com/PagerDuty/txpypd) and is on it's way to catching up now.
+Do you develop **twisted** applications? An asynchronous port of this library
+for [Twisted](http://twistedmatrix.com) exists
+[txpypd](https://github.com/PagerDuty/txpypd) and is on it's way to
+catching up now.
 
 ## Contributing
 All help is welcome. Unittests are great to have more of. Suggestions welcome.

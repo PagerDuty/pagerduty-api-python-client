@@ -438,7 +438,7 @@ class Entity(ClientMixin):
 
     @classmethod
     def create(cls, data=None, api_key=None, endpoint=None, add_headers=None,
-               data_key=None, response_data_key=None, **kwargs):
+               data_key=None, response_data_key=None, method='POST', **kwargs):
         """
         Create an instance of the Entity model by calling to the API endpoint.
 
@@ -462,7 +462,7 @@ class Entity(ClientMixin):
         if endpoint is None:
             endpoint = cls.get_endpoint()
 
-        inst._set(cls._parse(inst.request('POST',
+        inst._set(cls._parse(inst.request(method,
                                           endpoint=endpoint,
                                           data=body,
                                           query_params=kwargs,

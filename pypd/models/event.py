@@ -12,6 +12,8 @@ from ..mixins import stringtype
 
 
 class Event(Entity):
+    """A model representing V1 Events in PagerDuty's API."""
+
     base_url = 'https://events.pagerduty.com/generic/2010-04-15/'\
                'create_event.json'
     EVENT_TYPES = ('trigger', 'acknowledge', 'resolve',)
@@ -48,3 +50,23 @@ class Event(Entity):
                             query_params=kwargs,
                             add_headers=add_headers,
                             )
+
+
+class EventV2(Event):
+    """Use the PagerDuty V2 Events API."""
+
+    base_url = 'https://events.pagerduty.com/v2/enqueue'
+    SEVERITY_TYPES = ('critical', 'error', 'warning', 'info',)
+
+    @classmethod
+    def validate(cls, event_info):
+        """Validate that provided event information is valid."""
+        assert 'routing_key' in event_info
+        assert isinstance(event_info['routing_key'], stringtype)
+        assert 'event_action' in event_info
+        assert event_info['event_action'] in cls.EVENT_TYPES
+        assert 'payload' in event_info
+        payload = event_info['payload']
+        assert payload['summary']
+        assert payload['source']
+        assert payload['severity'] in cls.SEVERITY_TYPES

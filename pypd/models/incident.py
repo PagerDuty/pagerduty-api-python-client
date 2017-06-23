@@ -8,16 +8,21 @@ except ImportError:
 from .entity import Entity
 from .log_entry import LogEntry
 from .note import Note
+from .alert import Alert
 from ..errors import MissingFromEmail
 
 
 class Incident(Entity):
+    """Represents an Incident in PagerDuty's API."""
+
+    STR_OUTPUT_FIELDS = ('id', 'status',)
+
     logEntryFactory = LogEntry
     noteFactory = Note
+    alertFactory = Alert
 
     def resolve(self, from_email, resolution=None):
         """Resolve an incident using a valid email address."""
-
         if from_email is None or not isinstance(from_email, basestring):
             raise MissingFromEmail(from_email)
 
@@ -123,4 +128,33 @@ class Incident(Entity):
             add_headers=add_headers,
             data_key='duration',
             data=3600,
+        )
+
+    def merge(self, from_email, source_incidents):
+        """Merge other incidents into this incident."""
+        if from_email is None or not isinstance(from_email, basestring):
+            raise MissingFromEmail(from_email)
+
+        add_headers = {'from': from_email, }
+        endpoint = '/'.join((self.endpoint, self.id, 'merge'))
+        incident_ids = [entity['id'] if isinstance(entity, Entity) else entity
+                        for entity in source_incidents]
+        incident_references = [{'type': 'incident_reference', 'id': id_}
+                               for id_ in incident_ids]
+
+        return self.__class__.create(
+            endpoint=endpoint,
+            api_key=self.api_key,
+            add_headers=add_headers,
+            data_key='source_incidents',
+            data=incident_references,
+            method='PUT',
+        )
+
+    def alerts(self):
+        """Query for alerts attached to this incident."""
+        endpoint = '/'.join((self.endpoint, self.id, 'alerts'))
+        return self.alertFactory.find(
+            endpoint=endpoint,
+            api_key=self.api_key,
         )
