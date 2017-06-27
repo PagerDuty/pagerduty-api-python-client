@@ -9,6 +9,7 @@ from numbers import Number
 import sys
 
 import requests
+import six
 
 from .log import log
 from .errors import (BadRequest, UnknownError, InvalidResponse, InvalidHeaders)
@@ -17,12 +18,6 @@ from .errors import (BadRequest, UnknownError, InvalidResponse, InvalidHeaders)
 CONTENT_TYPE = 'application/vnd.pagerduty+json;version=2'
 AUTH_TEMPLATE = 'Token token={0}'
 BASIC_AUTH_TEMPLATE = 'Basic {0}'
-
-
-if sys.version_info[0] < 3:
-    stringtype = basestring
-else:
-    stringtype = str
 
 
 class ClientMixin(object):
@@ -94,7 +89,7 @@ class ClientMixin(object):
             headers.update(**add_headers)
 
         for k, v in query_params.copy().items():
-            if isinstance(v, stringtype):
+            if isinstance(v, six.string_types):
                 continue
             elif isinstance(v, Number):
                 continue

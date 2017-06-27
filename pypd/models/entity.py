@@ -12,7 +12,9 @@ try:
 except ImportError:
     import json
 
-from ..mixins import ClientMixin, stringtype
+import six
+
+from ..mixins import ClientMixin
 from ..log import warn
 
 
@@ -401,7 +403,7 @@ class Entity(ClientMixin):
         exclude = kwargs.pop('exclude', None)
 
         # if exclude param was passed a a string, list-ify it
-        if isinstance(exclude, stringtype):
+        if isinstance(exclude, six.string_types):
             exclude = [exclude, ]
 
         query_params = cls.translate_query_params(**kwargs)

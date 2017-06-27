@@ -5,6 +5,8 @@ try:
 except ImportError:
     import json
 
+import six
+
 from .entity import Entity
 from .log_entry import LogEntry
 from .note import Note
@@ -23,7 +25,7 @@ class Incident(Entity):
 
     def resolve(self, from_email, resolution=None):
         """Resolve an incident using a valid email address."""
-        if from_email is None or not isinstance(from_email, basestring):
+        if from_email is None or not isinstance(from_email, six.string_types):
             raise MissingFromEmail(from_email)
 
         endpoint = '/'.join((self.endpoint, self.id,))
@@ -48,7 +50,7 @@ class Incident(Entity):
         """Resolve an incident using a valid email address."""
         endpoint = '/'.join((self.endpoint, self.id,))
 
-        if from_email is None or not isinstance(from_email, basestring):
+        if from_email is None or not isinstance(from_email, six.string_types):
             raise MissingFromEmail(from_email)
 
         add_headers = {'from': from_email, }
@@ -101,7 +103,7 @@ class Incident(Entity):
 
     def create_note(self, from_email, content):
         """Create a note for this incident."""
-        if from_email is None or not isinstance(from_email, basestring):
+        if from_email is None or not isinstance(from_email, six.string_types):
             raise MissingFromEmail(from_email)
 
         endpoint = '/'.join((self.endpoint, self.id, 'notes'))
@@ -116,7 +118,7 @@ class Incident(Entity):
 
     def snooze(self, from_email, duration):
         """Snooze this incident for `duration` seconds."""
-        if from_email is None or not isinstance(from_email, basestring):
+        if from_email is None or not isinstance(from_email, six.string_types):
             raise MissingFromEmail(from_email)
 
         endpoint = '/'.join((self.endpoint, self.id, 'snooze'))
@@ -132,7 +134,7 @@ class Incident(Entity):
 
     def merge(self, from_email, source_incidents):
         """Merge other incidents into this incident."""
-        if from_email is None or not isinstance(from_email, basestring):
+        if from_email is None or not isinstance(from_email, six.string_types):
             raise MissingFromEmail(from_email)
 
         add_headers = {'from': from_email, }
