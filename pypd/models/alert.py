@@ -1,10 +1,6 @@
 # Copyright (c) PagerDuty.
 # See LICENSE for details.
-
-try:
-    import ujson as json
-except ImportError:
-    import json
+import six
 
 from .entity import Entity
 from ..errors import InvalidArguments, MissingFromEmail
@@ -26,7 +22,7 @@ class Alert(Entity):
 
     def resolve(self, from_email):
         """Resolve an alert using a valid email address."""
-        if from_email is None or not isinstance(from_email, basestring):
+        if from_email is None or not isinstance(from_email, six.string_types):
             raise MissingFromEmail(from_email)
 
         parent_incident_id = self['incident']['id']
@@ -50,7 +46,7 @@ class Alert(Entity):
 
     def associate(self, from_email, new_parent_incident=None):
         """Associate an alert with an incident using a valid email address."""
-        if from_email is None or not isinstance(from_email, basestring):
+        if from_email is None or not isinstance(from_email, six.string_types):
             raise MissingFromEmail(from_email)
 
         if new_parent_incident is None:

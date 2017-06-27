@@ -1,9 +1,6 @@
 # Copyright (c) PagerDuty.
 # See LICENSE for details.
-try:
-    import ujson as json
-except ImportError:
-    import json
+import json
 
 
 class Error(Exception):

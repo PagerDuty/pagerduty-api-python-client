@@ -7,8 +7,9 @@ Entities should be used as the base for all things that ought to be queryable
 via PagerDuty v2 API.
 """
 
+import six
+
 from .entity import Entity
-from ..mixins import stringtype
 
 
 class Event(Entity):
@@ -22,12 +23,12 @@ class Event(Entity):
     def validate(cls, event_info):
         """Validate that provided event information is valid."""
         assert 'service_key' in event_info
-        assert isinstance(event_info['service_key'], stringtype)
+        assert isinstance(event_info['service_key'], six.string_types)
         assert 'event_type' in event_info
         assert event_info['event_type'] in cls.EVENT_TYPES
         if event_info['event_type'] != cls.EVENT_TYPES[0]:
             assert 'incident_key' in event_info
-            assert isinstance(event_info['incident_key'], stringtype)
+            assert isinstance(event_info['incident_key'], six.string_types)
         else:
             assert 'description' in event_info
 
@@ -62,7 +63,7 @@ class EventV2(Event):
     def validate(cls, event_info):
         """Validate that provided event information is valid."""
         assert 'routing_key' in event_info
-        assert isinstance(event_info['routing_key'], stringtype)
+        assert isinstance(event_info['routing_key'], six.string_types)
         assert 'event_action' in event_info
         assert event_info['event_action'] in cls.EVENT_TYPES
         assert 'payload' in event_info

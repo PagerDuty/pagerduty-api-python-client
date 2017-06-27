@@ -6,13 +6,12 @@ Entity module provides a base class Entity for defining a PagerDuty entity.
 Entities should be used as the base for all things that ought to be queryable
 via PagerDuty v2 API.
 """
+import json
 import re
-try:
-    import ujson as json
-except ImportError:
-    import json
 
-from ..mixins import ClientMixin, stringtype
+import six
+
+from ..mixins import ClientMixin
 from ..log import warn
 
 
@@ -401,7 +400,7 @@ class Entity(ClientMixin):
         exclude = kwargs.pop('exclude', None)
 
         # if exclude param was passed a a string, list-ify it
-        if isinstance(exclude, stringtype):
+        if isinstance(exclude, six.string_types):
             exclude = [exclude, ]
 
         query_params = cls.translate_query_params(**kwargs)

@@ -1,2 +1,2 @@
-ujson
 requests
+six

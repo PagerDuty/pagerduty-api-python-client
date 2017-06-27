@@ -1,14 +1,10 @@
 """Helpful mixins for PagerDuty entity classes."""
 import datetime
 import logging
-try:
-    import ujson as json
-except ImportError:
-    import json
 from numbers import Number
-import sys
 
 import requests
+import six
 
 from .log import log
 from .errors import (BadRequest, UnknownError, InvalidResponse, InvalidHeaders)
@@ -17,12 +13,6 @@ from .errors import (BadRequest, UnknownError, InvalidResponse, InvalidHeaders)
 CONTENT_TYPE = 'application/vnd.pagerduty+json;version=2'
 AUTH_TEMPLATE = 'Token token={0}'
 BASIC_AUTH_TEMPLATE = 'Basic {0}'
-
-
-if sys.version_info[0] < 3:
-    stringtype = basestring
-else:
-    stringtype = str
 
 
 class ClientMixin(object):
@@ -57,7 +47,7 @@ class ClientMixin(object):
             return None
 
         try:
-            response = json.loads(response.text)
+            response = response.json()
         except:
             raise InvalidResponse(response.text)
 
@@ -70,7 +60,7 @@ class ClientMixin(object):
         Need to be able to inject Mocked response objects here.
         """
         log('Doing HTTP [{3}] request: {0} - headers: {1} - payload: {2}'.format(
-            args[0], kwargs.get('headers'), kwargs.get('data'), method,),
+            args[0], kwargs.get('headers'), kwargs.get('json'), method,),
             level=logging.DEBUG,)
         requests_method = getattr(requests, method)
         return self._handle_response(requests_method(*args, **kwargs))
@@ -94,7 +84,7 @@ class ClientMixin(object):
             headers.update(**add_headers)
 
         for k, v in query_params.copy().items():
-            if isinstance(v, stringtype):
+            if isinstance(v, six.string_types):
                 continue
             elif isinstance(v, Number):
                 continue
@@ -118,7 +108,7 @@ class ClientMixin(object):
         }
 
         if data is not None:
-            kwargs['data'] = json.dumps(data)
+            kwargs['json'] = data
 
         return self._do_request(
             method.lower(),

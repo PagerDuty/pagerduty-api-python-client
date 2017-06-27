@@ -1,9 +1,10 @@
 # Copyright (c) PagerDuty.
 # See LICENSE for details.
+import six
+
 from .entity import Entity
 from .user import User
 from .escalation_policy import EscalationPolicy
-from ..mixins import stringtype
 
 
 class Team(Entity):
@@ -17,7 +18,7 @@ class Team(Entity):
         if isinstance(escalation_policy, Entity):
             escalation_policy = escalation_policy['id']
 
-        assert isinstance(escalation_policy, stringtype)
+        assert isinstance(escalation_policy, six.string_types)
 
         endpoint = '{0}/{1}/escalation_policies/{2}'.format(
             self.endpoint,
@@ -32,7 +33,7 @@ class Team(Entity):
         if isinstance(escalation_policy, Entity):
             escalation_policy = escalation_policy['id']
 
-        assert isinstance(escalation_policy, stringtype)
+        assert isinstance(escalation_policy, six.string_types)
 
         endpoint = '{0}/{1}/escalation_policies/{2}'.format(
             self.endpoint,
@@ -46,7 +47,7 @@ class Team(Entity):
         if isinstance(user, Entity):
             user = user['id']
 
-        assert isinstance(user, stringtype)
+        assert isinstance(user, six.string_types)
 
         endpoint = '{0}/{1}/escalation_policies/{2}'.format(
             self.endpoint,
@@ -60,7 +61,7 @@ class Team(Entity):
         if isinstance(user, User):
             user = user['id']
 
-        assert isinstance(user, stringtype)
+        assert isinstance(user, six.string_types)
 
         endpoint = '{0}/{1}/users/{2}'.format(
             self.endpoint,
