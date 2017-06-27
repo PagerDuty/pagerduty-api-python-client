@@ -127,7 +127,7 @@ class Incident(Entity):
             api_key=self.api_key,
             add_headers=add_headers,
             data_key='duration',
-            data=3600,
+            data=duration,
         )
 
     def merge(self, from_email, source_incidents):
