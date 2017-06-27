@@ -6,11 +6,8 @@ Entity module provides a base class Entity for defining a PagerDuty entity.
 Entities should be used as the base for all things that ought to be queryable
 via PagerDuty v2 API.
 """
+import json
 import re
-try:
-    import ujson as json
-except ImportError:
-    import json
 
 import six
 

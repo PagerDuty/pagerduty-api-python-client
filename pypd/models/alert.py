@@ -1,11 +1,5 @@
 # Copyright (c) PagerDuty.
 # See LICENSE for details.
-
-try:
-    import ujson as json
-except ImportError:
-    import json
-
 import six
 
 from .entity import Entity
