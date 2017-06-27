@@ -96,6 +96,21 @@ Run all the tests (unittests only currently) with:
 ```sh
 tox
 ```
+## Proxy Support
+There are 2 ways you can use an HTTP(S) proxy. The first method is using environment variables:
+
+```sh
+export HTTP_PROXY=http://myproxy.domain.tld:8080
+export HTTPS_PROXY=http://myproxy.domain.tld:8080
+```
+
+The other method is to add the proxy details in your code, like this:
+
+```python
+import pypd
+pypd.api_key = "SOMESECRETAPIKEY"
+pypd.proxies = {'http': 'http://myproxy.domain.tld:8080', 'https': 'http://myproxy.domain.tld:8080'}
+```
 
 ## Links
 
