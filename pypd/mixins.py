@@ -46,12 +46,10 @@ class ClientMixin(object):
             from pypd import base_url
             self.base_url = base_url
 
-        if proxies:
-            self.proxies = proxies
-
-        if self.proxies is None:
+        if not proxies:
             from pypd import proxies
-            self.proxies = proxies
+
+        self.proxies = proxies
 
     def _handle_response(self, response):
         if response.status_code == 404:
