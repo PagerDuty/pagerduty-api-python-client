@@ -97,6 +97,28 @@ Run all the tests (unittests only currently) with:
 tox
 ```
 
+## Proxy Support
+The underlying HTTP client library - [requests](python-requests.org) - allows for two mechanisms to set the proxies.
+
+You could set it via environment variables:
+
+```sh
+export HTTP_PROXY=http://myproxy.domain.tld:8080
+export HTTPS_PROXY=http://myproxy.domain.tld:8080
+```
+
+The other method is to add the proxy details in your code, like this:
+
+```python
+import pypd
+pypd.api_key = "SOMESECRETAPIKEY"
+pypd.proxies = {'http': 'http://myproxy.domain.tld:8080', 'https': 'http://myproxy.domain.tld:8080'}
+```
+
+**Note:** The proxies configured inside your code will have preference over the proxies set in the environment variables.
+
+Read: [The `requests` module and it's support for proxies](http://docs.python-requests.org/en/master/user/advanced/#proxies)
+
 ## Links
 
 Do you develop **twisted** applications? An asynchronous port of this library

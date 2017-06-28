@@ -18,8 +18,9 @@ BASIC_AUTH_TEMPLATE = 'Basic {0}'
 class ClientMixin(object):
     api_key = None
     base_url = None
+    proxies = None
 
-    def __init__(self, api_key=None, base_url=None):
+    def __init__(self, api_key=None, base_url=None, proxies=None):
         # if no api key is provided try to get one from the packages api_key
         if api_key:
             self.api_key = api_key
@@ -34,6 +35,11 @@ class ClientMixin(object):
         if self.base_url is None:
             from pypd import base_url
             self.base_url = base_url
+
+        if not proxies:
+            from pypd import proxies
+
+        self.proxies = proxies
 
     def _handle_response(self, response):
         if response.status_code == 404:
@@ -105,6 +111,7 @@ class ClientMixin(object):
         kwargs = {
             'headers': headers,
             'params': query_params,
+            'proxies': self.proxies,
         }
 
         if data is not None:

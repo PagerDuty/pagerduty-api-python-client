@@ -24,7 +24,7 @@ from .models.vendor import Vendor
 
 api_key = None
 base_url = 'https://api.pagerduty.com'
-
+proxies = None
 
 def set_api_key_from_file(path, set_global=True):
     """Set the global api_key from a file path."""
