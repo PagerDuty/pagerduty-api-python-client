@@ -431,9 +431,13 @@ class Entity(ClientMixin):
         if 'maximum' not in kwargs:
             kwargs['maximum'] = 1
 
-        # call find and extract the first iterated value from the result
-        iterable = iter(cls.find(*args, **kwargs))
-        return next(iterable)
+        try:
+            # call find and extract the first iterated value from the result
+            iterable = iter(cls.find(*args, **kwargs))
+            return next(iterable)
+        except StopIteration:
+            # no result was found
+            return None
 
     @classmethod
     def create(cls, data=None, api_key=None, endpoint=None, add_headers=None,
