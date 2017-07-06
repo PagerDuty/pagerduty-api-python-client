@@ -8,7 +8,7 @@ from .entity import Entity
 from .log_entry import LogEntry
 from .note import Note
 from .alert import Alert
-from ..errors import MissingFromEmail
+from ..errors import InvalidArguments, MissingFromEmail
 
 
 class Incident(Entity):
@@ -55,6 +55,42 @@ class Incident(Entity):
             'incident': {
                 'type': 'incident',
                 'status': 'acknowledged',
+            }
+        }
+
+        result = self.request('PUT',
+                              endpoint=endpoint,
+                              add_headers=add_headers,
+                              data=data,)
+        return result
+
+    def reassign(self, from_email, user_ids):
+        """Reassign an incident to other users using a valid email address."""
+        endpoint = '/'.join((self.endpoint, self.id,))
+
+        if from_email is None or not isinstance(from_email, six.string_types):
+            raise MissingFromEmail(from_email)
+
+        if user_ids is None or not isinstance(user_ids, list):
+            raise InvalidArguments(user_ids)
+        if not all([isinstance(i, six.string_types) for i in user_ids]):
+            raise InvalidArguments(user_ids)
+
+        assignees = [
+            {
+                'assignee': {
+                    'id': user_id,
+                    'type': 'user_reference',
+                }
+            }
+            for user_id in user_ids
+        ]
+
+        add_headers = {'from': from_email, }
+        data = {
+            'incident': {
+                'type': 'incident',
+                'assignments': assignees,
             }
         }
 
