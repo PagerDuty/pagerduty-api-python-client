@@ -115,9 +115,22 @@ class User(Entity):
         """Please implement me."""
         raise NotImplemented
 
-    def update_notification_rule(self, *args, **kwargs):
-        """Please implement me."""
-        raise NotImplemented
+    def update_notification_rule(self, data, **kwargs):
+        """
+        Update a user's notification rule
+        :param data: dict representing NotificationRule
+                     See v2 API Reference - REQUEST SCHEMA:
+                     https://v2.developer.pagerduty.com/page/api-reference#!/Users/put_users_id_notification_rules_notification_rule_id
+        :param kwargs:
+        :return: dict representing updated NotificationRule
+        """
+        endpoint = '{0}/{1}/notification_rules/{2}'.format(
+            self.endpoint,
+            self['id'],
+            data.get('id'),
+        )
+        result = self.request('PUT', endpoint=endpoint, data=data, query_params=kwargs)
+        return result['notification_rule']
 
     def update(self, *args, **kwargs):
         """Update this team."""
