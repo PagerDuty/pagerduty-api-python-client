@@ -13,7 +13,7 @@ from operator import itemgetter
 import requests_mock
 
 from pypd import Incident
-from pypd.errors import MissingFromEmail
+from pypd.errors import InvalidArguments, MissingFromEmail
 
 
 def chunks(l, n):
@@ -55,7 +55,7 @@ class IncidentTestCase(unittest.TestCase):
 
     @requests_mock.Mocker()
     def test_resolve_invalid_from_email(self, m):
-        """Coverge for using an invalid (cheaply validated) from email."""
+        """Coverage for using an invalid (cheaply validated) from email."""
         query = {
             'limit': 1,
             'offset': 0,
@@ -96,6 +96,46 @@ class IncidentTestCase(unittest.TestCase):
         m.register_uri('PUT', url, json=resolve_response, complete_qs=True)
         response = incident.resolve('jdc@pagerduty.com', resolution=resolution)
         self.assertEqual(incident['id'], response['incidents'][0]['id'])
+
+    @requests_mock.Mocker()
+    def test_reassign_invalid_from_email(self, m):
+        """Coverage for using an invalid (cheaply validated) from email."""
+        query = {
+            'limit': 1,
+            'offset': 0,
+        }
+        url = self.url + '?{}'.format(urlencode(query))
+        m.register_uri('GET', url, json=self.query_datas[0], complete_qs=True)
+        incident = Incident.find_one(api_key=self.api_key)
+
+        with self.assertRaises(MissingFromEmail):
+            incident.reassign(None, ['foo'])
+        with self.assertRaises(MissingFromEmail):
+            incident.reassign(1, ['foo'])
+        with self.assertRaises(MissingFromEmail):
+            incident.reassign(incident, ['foo'])
+
+    @requests_mock.Mocker()
+    def test_reassign_invalid_user_id(self, m):
+        """Coverage for using an invalid (cheaply validated) assignee."""
+        query = {
+            'limit': 1,
+            'offset': 0,
+        }
+        url = self.url + '?{}'.format(urlencode(query))
+        m.register_uri('GET', url, json=self.query_datas[0], complete_qs=True)
+        incident = Incident.find_one(api_key=self.api_key)
+
+        with self.assertRaises(InvalidArguments):
+            incident.reassign('jdc@pagerduty.com', None)
+        with self.assertRaises(InvalidArguments):
+            incident.reassign('jdc@pagerduty.com', 1)
+        with self.assertRaises(InvalidArguments):
+            incident.reassign('jdc@pagerduty.com', 'foo')
+        with self.assertRaises(InvalidArguments):
+            incident.reassign('jdc@pagerduty.com', [None])
+        with self.assertRaises(InvalidArguments):
+            incident.reassign('jdc@pagerduty.com', [1])
 
     @requests_mock.Mocker()
     def test_snooze_invalid_from_email(self, m):
