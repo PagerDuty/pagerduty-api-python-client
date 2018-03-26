@@ -13,7 +13,7 @@ options = {
     'author': 'JD Cumpson',
     'author_email': 'jdc@pagerduty.com',
     'maintainer': 'JD Cumpson',
-    'maintainer_email': 'jdc@pagerduty.com',
+    'maintainer_email': 'abrooks@pagerduty.com',
     'license': 'MIT',
     'url': 'https://github.com/PagerDuty/pagerduty-api-python-client',
     'download_url': 'https://github.com/PagerDuty/pagerduty-api-python-client/archive/master.tar.gz',
