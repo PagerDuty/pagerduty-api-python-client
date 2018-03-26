@@ -32,3 +32,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   major version updates as sane as possible.
 
 
+## [1.1.0] - 2018-03-26
+### Added
+- Adding ability to query a Schedule's on-call users
+- Add ability to reassign incidents to other people
+
+### Changed
+- Use JSON library from standard lib instead of ujson. The speed increase ujson
+  delivers is likely not worth it as the latency of doing
+  HTTP requests is way bigger than the time it takes to decode/encode JSON data.
+  This also makes use of the convenience API Requests has for sending and
+  receiving data as JSON.
+- Add HTTP(S) proxy support via requests configuration / api.
+- Fixed bug that had snooze durations hardcoded.
+- find_one() should return None if no results are found. Before this
+  `find_one()` would throw a `StopIteration` exception in case no
+  results were found with the query which seems a bit hostile. `find()` on the
+  other hand returns an empty array so it would make more sense if `find_one()`
+  returned `None` in case no results were found.
