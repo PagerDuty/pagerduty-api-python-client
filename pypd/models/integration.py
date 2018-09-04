@@ -76,5 +76,5 @@ class Integration(Entity):
             endpoint = 'services/{0}/integrations'.format(sid)
 
         # otherwise endpoint should contain the service path too
-        getattr(Entity, 'create').__func__(cls, endpoint=endpoint, data=data,
-                                          *args, **kwargs)
+        return getattr(Entity, 'create').__func__(cls, endpoint=endpoint,
+                                                  data=data, *args, **kwargs)
