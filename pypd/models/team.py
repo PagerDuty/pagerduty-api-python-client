@@ -49,7 +49,7 @@ class Team(Entity):
 
         assert isinstance(user, six.string_types)
 
-        endpoint = '{0}/{1}/escalation_policies/{2}'.format(
+        endpoint = '{0}/{1}/users/{2}'.format(
             self.endpoint,
             self['id'],
             user,
