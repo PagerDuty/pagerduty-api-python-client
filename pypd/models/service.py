@@ -25,7 +25,7 @@ class Service(Entity):
 
     def create_integration(self, integration_info, **kwargs):
         """
-        Create an integration for this incident.
+        Create an integration for this service.
 
         See: https://v2.developer.pagerduty.com/v2/page/api-reference#!/
               Services/post_services_id_integrations
