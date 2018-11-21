@@ -42,7 +42,7 @@ alerts = incident.alerts()
 incident.snooze(from_email='jdc@pagerduty.com', 3600) # snooze for an hour
 incident.resolve(from_email='jdc@pagerduty.com', resolution='We solved a thing')
 incident.merge(from_email='jdc@pagerduty.com', [another_incident, ])
-incident.create_note(from_email='jdc@pagerduty.com', 'Dually noted.')
+incident.create_note(from_email='jdc@pagerduty.com', 'Duly noted.')
 
 # find users
 user = pypd.User.find_one(email="jdc@pagerduty.com")
