@@ -1,3 +1,7 @@
+# Deprecated
+
+This project has been deprecated. Please use [PDPyras](https://github.com/PagerDuty/pdpyras)
+
 # pypd - PagerDuty Python API Client
 A client in Python for PagerDuty's v2 API.
 
